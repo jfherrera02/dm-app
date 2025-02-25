@@ -1,7 +1,7 @@
 import 'package:dmessages/pages/register_page.dart';
 import 'package:dmessages/themes/light_mode.dart';
 import 'package:flutter/material.dart';
-// import 'pages/login_page.dart';
+// uncomment later-> import 'pages/login_page.dart';
 void main() {
   runApp(const MyApp());
 }
