@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1061228693144",
+    "project_id": "dmessages-1fd4b",
+    "storage_bucket": "dmessages-1fd4b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1061228693144:android:c6d22b80a54d45a01d72ed",
+        "android_client_info": {
+          "package_name": "com.example.dmessages"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxvJ3AuhWLQIh79EvMAwe0zr231KCDXZw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

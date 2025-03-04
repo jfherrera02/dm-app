@@ -1,3 +1,4 @@
+import 'package:dmessages/auth/auth_service.dart';
 import 'package:dmessages/components/my_button.dart';
 import 'package:flutter/material.dart';
 import 'package:dmessages/components/my_textfield.dart';
@@ -9,10 +10,30 @@ class LoginPage extends StatelessWidget{
   final TextEditingController _passwordController = TextEditingController();
   
   // changed to non-constant from constant due to error 
-  LoginPage({super.key});
+  // touch to go to register
+  final void Function()? onTap;
 
+  LoginPage({super.key, required this.onTap});
+  
   // method for logging in
-  void login(){}
+  void login(BuildContext context) async {
+    // authentication service:
+    final authService = AuthService();
+
+    // login method
+    try{
+      await authService.signinWithEmailPassword(_emailController.text, _passwordController.text);
+    }
+    // catch errors 
+    catch(e){
+    showDialog(
+      context: context, 
+      builder: (context) => AlertDialog(
+        title: Text(e.toString()),
+      )
+    );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,14 +78,17 @@ class LoginPage extends StatelessWidget{
             // login button
             MyButton(
               text: "Login",
-              onTap: login,
+              onTap: () => login(context),
             ),
 
             // register button
-            Text(
-              "Click to Register",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
+            GestureDetector(
+              onTap: onTap,
+              child: Text(
+                "Click to Register",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ],

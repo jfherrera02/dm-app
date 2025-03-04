@@ -1,3 +1,4 @@
+import 'package:dmessages/auth/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:dmessages/components/my_button.dart';
 import 'package:dmessages/components/my_textfield.dart';
@@ -8,12 +9,44 @@ class RegisterPage extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmController = TextEditingController();
-
   
-  RegisterPage({super.key});
+  // go to login
+  final void Function()? onTap;
+
+  RegisterPage({super.key, required this.onTap});
 
   // method for regestering account
-  void register(){}
+  void register(BuildContext context){
+    // get the authentication service
+    final _auth = AuthService();
+
+    // both passwords must match
+    // for successful registration
+    if (_passwordController.text == _confirmController.text) {
+      try{
+            _auth.signInWithEmailAndPassword(
+      _emailController.text, 
+      _passwordController.text,
+      );
+        } catch (e) {
+          showDialog(
+      context: context, 
+      builder: (context) => AlertDialog(
+        title: Text(e.toString()),
+      )
+    );
+        } 
+    }
+    // if passwords do not match -> advise user to fix
+    else {
+      showDialog(
+      context: context, 
+      builder: (context) => AlertDialog(
+        title: Text("The passwords do not match! Please make sure they are the same!"),
+      )
+    );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,17 +99,19 @@ class RegisterPage extends StatelessWidget {
             // login button
             MyButton(
               text: "Register",
-              onTap: register,
+              onTap: () => register(context),
             ),
             
             const SizedBox(height: 25),
 
             // register button
-            Text(
-              "Back to Login",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.primary), 
+            GestureDetector( onTap: onTap,
+              child: Text(
+                "Back to Login",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.primary), 
+              ),
             ),
           ]
         ),
