@@ -1,4 +1,4 @@
-import 'package:dmessages/auth/auth_service.dart';
+import 'package:dmessages/services/auth/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:dmessages/components/my_button.dart';
 import 'package:dmessages/components/my_textfield.dart';

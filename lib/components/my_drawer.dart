@@ -1,5 +1,5 @@
 import 'package:dmessages/pages/settings_page.dart';
-import 'package:dmessages/auth/auth_service.dart';
+import 'package:dmessages/services/auth/auth_service.dart';
 import 'package:flutter/material.dart';
 
 class MyDrawer extends StatelessWidget  {
@@ -7,9 +7,9 @@ class MyDrawer extends StatelessWidget  {
 
   void logout(){
     // obtain the authentication service
-    final _auth = AuthService();
+    final auth = AuthService();
     // then just sign out
-    _auth.signOut();
+    auth.signOut();
   }
 
   @override
@@ -24,8 +24,8 @@ class MyDrawer extends StatelessWidget  {
           Padding(
             padding: const EdgeInsets.only(left: 25.0),
             child: ListTile(
-              title: Text("Dmessages Home"),
-              leading: Icon(Icons.home),
+              title: const Text("Dmessages Home"),
+              leading: const Icon(Icons.home),
               onTap: () {
                 // pop the drawer
                 Navigator.pop(context);
@@ -36,8 +36,8 @@ class MyDrawer extends StatelessWidget  {
           Padding(
             padding: const EdgeInsets.only(left: 25.0),
             child: ListTile(
-              title: Text("Settings"),
-              leading: Icon(Icons.settings),
+              title: const Text("Settings"),
+              leading: const Icon(Icons.settings),
               onTap: () {
                 // pop drawer
                 Navigator.pop(context);
@@ -45,7 +45,7 @@ class MyDrawer extends StatelessWidget  {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => SettingsPage(),
+                    builder: (context) => const SettingsPage(),
                   ),
                  );
               },
@@ -59,8 +59,8 @@ class MyDrawer extends StatelessWidget  {
           Padding(
             padding: const EdgeInsets.only(left: 25.0),
             child: ListTile(
-              title: Text("Logout"),
-              leading: Icon(Icons.logout),
+              title: const Text("Logout"),
+              leading: const Icon(Icons.logout),
               onTap: logout,
             ),
           ),
