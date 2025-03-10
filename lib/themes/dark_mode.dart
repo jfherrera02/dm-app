@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 
 ThemeData darkMode = ThemeData(
   colorScheme: ColorScheme.dark(
-    primary: Color(0xFF800020), // Deep Burgundy
-    secondary: Color(0xFFFFD700), // Gold
-    surface: Color(0xFF4A001F), // Darker Burgundy for background
-    onPrimary: Colors.white, // White text on primary color
-    onSecondary: Colors.black, // Black text on secondary color
-    onSurface: Colors.white, // White text on surface
+    surface: Colors.brown.shade900, // Deep maroon/burgundy-like background
+    primary: Colors.amber.shade400, // Golden-yellow accent for highlights
+    secondary: Colors.brown.shade800, // Dark brown for subtle contrast
+    tertiary: Colors.grey.shade300, // Light grey for input fields & borders
+    inversePrimary: Colors.white, // White for high contrast text/icons
   ),
 );

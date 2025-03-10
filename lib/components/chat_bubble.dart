@@ -14,14 +14,14 @@ class ChatBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color:isCurrentUser ? Colors.amber: Colors.grey.shade500,
+        color:isCurrentUser ? Colors.amber: const Color.fromARGB(255, 207, 207, 207),
         borderRadius: BorderRadius.circular(12)
       ),
       padding: const EdgeInsets.all(16),
       margin: const EdgeInsets.symmetric(vertical: 2.5, horizontal: 25),
       child: Text(
         message,
-        style: TextStyle(color: Colors.white),),
+        style: TextStyle(color: Colors.black),),
     );
   }
 

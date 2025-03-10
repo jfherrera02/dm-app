@@ -44,18 +44,16 @@ class LoginPage extends StatelessWidget{
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // App logo
-            Icon(Icons.message,
-            size: 60,
-            color: Theme.of(context).colorScheme.primary,
-            ),
+            Image(image: AssetImage('assets/images/tether-icon.png')),
             // Login Greeting Message
             Text(
-              "Welcome to Dmessages!",
+              "Welcome to Tether",
               style: TextStyle(
-                color: Theme.of(context).colorScheme.primary,
-                fontSize: 16,
+                color: Colors.black,
+                fontSize: 32,
+                fontStyle: FontStyle.italic,
               ),
-            ),
+            ), 
 
             const SizedBox(height: 25),
 
@@ -82,12 +80,15 @@ class LoginPage extends StatelessWidget{
             ),
 
             // register button
-            GestureDetector(
-              onTap: onTap,
-              child: Text(
-                "Click to Register",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: GestureDetector(
+                onTap: onTap,
+                child: Text(
+                  "Click to Register",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),

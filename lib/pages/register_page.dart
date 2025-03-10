@@ -8,8 +8,9 @@ class RegisterPage extends StatelessWidget {
   // username to be integrated in future versions
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _confirmController = TextEditingController();
-  
+
   // go to login
   final void Function()? onTap;
 
@@ -27,6 +28,7 @@ class RegisterPage extends StatelessWidget {
             _auth.signInWithEmailAndPassword(
       _emailController.text, 
       _passwordController.text,
+      _usernameController.text,
       );
         } catch (e) {
           showDialog(
@@ -57,10 +59,7 @@ class RegisterPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // App logo
-            Icon(Icons.message,
-            size: 60,
-            color: Theme.of(context).colorScheme.primary,
-            ),
+            Image(image: AssetImage('assets/images/tether-icon.png')),
             // Login Greeting Message
             Text(
               "Create Your Account",
@@ -79,6 +78,15 @@ class RegisterPage extends StatelessWidget {
               controller: _emailController,
             ),
             const SizedBox(height: 10),
+
+            // username entry
+            MyTextField(
+              hintText: "Username",
+              obscureText: false,
+              controller: _usernameController,
+            ),
+            const SizedBox(height: 10),
+
             // password
             MyTextField(
               hintText: "Password",
@@ -96,15 +104,15 @@ class RegisterPage extends StatelessWidget {
 
             const SizedBox(height: 25),
 
-            // login button
+            // Register button
             MyButton(
-              text: "Register",
+              text: "Register", 
               onTap: () => register(context),
             ),
             
             const SizedBox(height: 25),
 
-            // register button
+            // Back to Login button
             GestureDetector( onTap: onTap,
               child: Text(
                 "Back to Login",

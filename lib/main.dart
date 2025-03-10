@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget{
   Widget build(BuildContext context) {
     return MaterialApp(
       // debugShowCheckedModeBanner:false,
-      home: const        AuthGate(),
+      home: const AuthGate(),
       theme: Provider.of<ThemeProvider>(context).themeData, // run light mode
     );
   }
