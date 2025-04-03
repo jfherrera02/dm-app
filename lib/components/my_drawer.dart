@@ -1,16 +1,10 @@
 import 'package:dmessages/pages/settings_page.dart';
-import 'package:dmessages/services/auth/auth_service.dart';
+import 'package:dmessages/services/auth/presentation/cubits/auth_cubits.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class MyDrawer extends StatelessWidget  {
   const MyDrawer ({super.key});
-
-  void logout(){
-    // obtain the authentication service
-    final auth = AuthService();
-    // then just sign out
-    auth.signOut();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +18,7 @@ class MyDrawer extends StatelessWidget  {
           Padding(
             padding: const EdgeInsets.only(left: 25.0),
             child: ListTile(
-              title: const Text("Dmessages Home"),
+              title: const Text("Tether"),
               leading: const Icon(Icons.home),
               onTap: () {
                 // pop the drawer
@@ -61,7 +55,8 @@ class MyDrawer extends StatelessWidget  {
             child: ListTile(
               title: const Text("Logout"),
               leading: const Icon(Icons.logout),
-              onTap: logout,
+              // new logout method using bloc/cubits
+              onTap: () => context.read<AuthCubit>().newlogout(),
             ),
           ),
         ],

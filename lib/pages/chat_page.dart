@@ -4,7 +4,6 @@ import 'package:dmessages/components/my_textfield.dart';
 import 'package:dmessages/services/auth/auth_service.dart';
 import 'package:dmessages/services/chat/chat_services.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class ChatPage extends StatefulWidget {
   // user requirements
@@ -12,11 +11,13 @@ class ChatPage extends StatefulWidget {
   // who the user is chatting with
   final String receiverEmail;
   final String receiverID;
+  final String receiverName;
 
-   ChatPage({
+   const ChatPage({
     super.key,
     required this.receiverEmail,
     required this.receiverID,
+    required this.receiverName,
   });
 
   @override
@@ -98,7 +99,7 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.receiverEmail),
+        title: Text(widget.receiverName),
         // Start: Cleaner, minimalist look
         // can also implement to all other app bars
         backgroundColor: Colors.transparent,

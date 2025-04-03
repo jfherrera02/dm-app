@@ -1,136 +1,180 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class UserProfilePage extends StatelessWidget {
-  const UserProfilePage({super.key});
+class UserProfilePage extends StatefulWidget {
+  // Allow other users to view current profile: 
+  // REQUIRE 1 thing (NEW) implementation
+  // uid
+  final String uid; 
+  const UserProfilePage({super.key, required this.uid});
+
+  @override
+  State<UserProfilePage> createState() => _UserProfilePageState();
+}
+
+class _UserProfilePageState extends State<UserProfilePage> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  String? _userName;
+  String? _profileImageUrl;
+  String? _bio;
+  int _followers = 0;
+  int _following = 0;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserProfile();
+  }
+
+  // Fetch User Profile Data
+  Future<void> _fetchUserProfile() async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null) return;
+
+      DocumentSnapshot userDoc = await _firestore.collection('Users').doc(user.uid).get();
+      if (!userDoc.exists) return;
+
+      setState(() {
+        _userName = userDoc.get('username');
+        _profileImageUrl = userDoc.get('profileImageUrl') ?? '';
+        _bio = userDoc.get('bio') ?? 'No bio yet.';
+        _followers = (userDoc.get('followers') as List<dynamic>?)?.length ?? 0;
+        _following = (userDoc.get('following') as List<dynamic>?)?.length ?? 0;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() => _isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Profile"),
-        backgroundColor: Colors.transparent,
-        foregroundColor: Colors.grey,
+        title: Text(_userName ?? "Profile", style: const TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
         elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              // TODO: Navigate to settings page
-            },
-          ),
-        ],
       ),
-      body: Column(
-        children: [
-          // Profile header (Profile pic, stats, edit button)
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              children: [
-                // Profile Picture
-                CircleAvatar(
-                  radius: 40,
-                  backgroundImage: AssetImage('assets/images/profile_placeholder.png'),
-                ),
-                const SizedBox(width: 20),
-
-                // Followers / Following / Posts
-                Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _buildStatColumn("Posts", "0"),  // Placeholder for posts
-                      _buildStatColumn("Friends", "120"),
-                      _buildStatColumn("Following", "98"),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Username & Bio
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Your Username",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  "This is your bio. Edit it to personalize your profile!",
-                  style: TextStyle(fontSize: 14, color: Colors.grey),
-                ),
-              ],
-            ),
-          ),
-
-          // Edit Profile Button
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  // TODO: Navigate to edit profile page
-                },
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.black,
-                  backgroundColor: Colors.grey.shade300,
-                ),
-                child: const Text("Edit Profile"),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              child: Column(
+                children: [
+                  const SizedBox(height: 20),
+                  _buildProfileHeader(),
+                  const SizedBox(height: 20),
+                  _buildProfileStats(),
+                  const SizedBox(height: 15),
+                  _buildEditProfileButton(),
+                  const SizedBox(height: 10),
+                  _buildPostGrid(),
+                ],
               ),
             ),
-          ),
+    );
+  }
 
-          const SizedBox(height: 10),
+  // Profile Header (Profile Picture & Username)
+  Widget _buildProfileHeader() {
+    return Column(
+      children: [
+        CircleAvatar(
+          radius: 50,
+          backgroundColor: Colors.grey[300],
+          backgroundImage: _profileImageUrl != null && _profileImageUrl!.isNotEmpty
+              ? NetworkImage(_profileImageUrl!)
+              : null,
+          child: _profileImageUrl == null || _profileImageUrl!.isEmpty
+              ? const Icon(Icons.person, size: 50, color: Colors.white)
+              : null,
+        ),
+        const SizedBox(height: 10),
+        Text(
+          _userName ?? "User",
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 5),
+        Text(
+          _bio ?? "No bio yet.",
+          style: const TextStyle(fontSize: 14, color: Colors.grey),
+        ),
+      ],
+    );
+  }
 
-          // Divider
-          const Divider(),
+  // Follower & Following Stats
+  Widget _buildProfileStats() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _buildStatColumn("Followers", _followers),
+        const SizedBox(width: 30),
+        _buildStatColumn("Following", _following),
+      ],
+    );
+  }
 
-          // Posts Grid (Placeholder)
-          Expanded(
-            child: GridView.builder(
-              padding: const EdgeInsets.all(8),
-              itemCount: 9, // Placeholder for 9 images
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3, // 3 images per row
-                crossAxisSpacing: 4,
-                mainAxisSpacing: 4,
-              ),
-              itemBuilder: (context, index) {
-                return Container(
-                  color: Colors.grey.shade400, // Placeholder for images
-                  child: const Icon(Icons.image, color: Colors.white, size: 40),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
+  // Stats Column Widget
+  Widget _buildStatColumn(String label, int count) {
+    return Column(
+      children: [
+        Text(
+          count.toString(),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 14, color: Colors.grey),
+        ),
+      ],
+    );
+  }
 
-      // Floating Button for Adding Posts (Future Feature)
-      floatingActionButton: FloatingActionButton(
+  // Edit Profile Button
+  Widget _buildEditProfileButton() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: ElevatedButton(
         onPressed: () {
-          // TODO: Implement add post functionality
+          // TODO: Implement edit profile functionality
         },
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        child: const Icon(Icons.add, color: Colors.white),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.grey[200],
+          foregroundColor: Colors.black,
+          minimumSize: const Size(double.infinity, 40),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+        child: const Text("Edit Profile"),
       ),
     );
   }
 
-  // Helper function for stats (Posts, Followers, Following)
-  Widget _buildStatColumn(String label, String count) {
-    return Column(
-      children: [
-        Text(count, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-        Text(label, style: const TextStyle(fontSize: 14, color: Colors.grey)),
-      ],
+  // Post Grid Placeholder
+  Widget _buildPostGrid() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: 9, // Placeholder for posts
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          crossAxisSpacing: 2,
+          mainAxisSpacing: 2,
+        ),
+        itemBuilder: (context, index) {
+          return Container(
+            color: Colors.grey[300],
+          );
+        },
+      ),
     );
   }
 }
