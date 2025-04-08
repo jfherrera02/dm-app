@@ -47,10 +47,7 @@ class MyDrawer extends StatelessWidget  {
           ),
 
           // logout drawer tile
-          // can further edit with a column to give logout
-          // padding so it is at the bottom
-          // NOT YET IMPLEMENTED
-          Padding(
+      Padding(
             padding: const EdgeInsets.only(left: 25.0),
             child: ListTile(
               title: const Text("Logout"),

@@ -20,7 +20,7 @@ class FirebaseProfileRepo implements ProfileRepository{
             uid: uid, 
             email: userData['email'], 
             username: userData['username'], 
-            bio: userData['bio'], 
+            bio: userData['bio'] ?? '', // bio can be null so give ''
             profileImageUrl: userData['profileImageUrl'].toString(),
             );
         }

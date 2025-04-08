@@ -1,6 +1,12 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dmessages/components/bio.dart';
+import 'package:dmessages/pages/profile/edit_profile.dart';
+import 'package:dmessages/pages/profile/presentation/cubit/profile_cubit.dart';
+import 'package:dmessages/pages/profile/presentation/cubit/profile_states.dart';
+import 'package:dmessages/services/auth/domain/app_user.dart';
+import 'package:dmessages/services/auth/presentation/cubits/auth_cubits.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class UserProfilePage extends StatefulWidget {
   // Allow other users to view current profile: 
@@ -14,22 +20,124 @@ class UserProfilePage extends StatefulWidget {
 }
 
 class _UserProfilePageState extends State<UserProfilePage> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  // read in the cubits
+  late final authCubit = context.read<AuthCubit> ();
+  late final profileCubit = context.read<ProfileCubit>(); 
 
-  String? _userName;
-  String? _profileImageUrl;
-  String? _bio;
-  int _followers = 0;
-  int _following = 0;
-  bool _isLoading = true;
+  // get the current user
+  late AppUser? currentUser = authCubit.newgetCurrentUser;
 
   @override
   void initState() {
     super.initState();
-    _fetchUserProfile();
+
+    // then load in the user profile data to show
+    profileCubit.fetchUserProfile(widget.uid);
   }
 
+  // begin making the UI for the profile page
+  @override
+  Widget build(BuildContext context) {
+      // use a bloc builder to provide the state of the profile and cubit 
+      return BlocBuilder<ProfileCubit, ProfileStates>(
+        builder: (context, state) {
+          // different states:
+          // loaded
+          if (state is ProfileLoaded) {
+            // retrieve the loaded user now 
+            final user = state.profileUser;
+            return Scaffold(
+            appBar: AppBar(
+              foregroundColor: Theme.of(context).colorScheme.primary,
+              actions: [
+                // create an 'edit profile' button
+                IconButton(
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      // go to the edit profile page when clicking button
+                      builder: (context) => EditProfile(user: user),
+                    )
+                  ), 
+                  icon: const Icon(Icons.settings),
+                  ),
+              ],
+            ),
+            // body
+            body: Center(
+              child: Column(
+                children: [
+                  // username 
+                  Text(
+                    user.username,
+                    style: TextStyle(color: Theme.of(context).colorScheme.primary
+                    ),
+                  ),
+                  
+                  // spacing 
+                  const SizedBox(height: 20),
+                  // followed by the profile picture:
+
+                  // THIS IS CRUCIAL ->
+                  // use the cached network image to load the profile image
+                  // and cache it for later use
+                  // (before implementing this, the profile image was not loading)
+                  // but it was already in the database
+                  // and the url was correct
+                  CachedNetworkImage(
+                    imageUrl: user.profileImageUrl,
+                    // when loading.... ->
+                    placeholder: (context, url) => 
+                  const CircularProgressIndicator(),
+                  // in case of an error ->
+                  errorWidget: (context, url, error) => 
+                  Icon(Icons.person,
+                  size: 68,
+                  color: Theme.of(context).colorScheme.primary,
+                 ),
+                // when loaded:
+                imageBuilder: (context, imageProvider) => Image(
+                  image: imageProvider,
+                  // now ensure the image fills up the profile image area
+                 fit: BoxFit.cover,
+                ),
+            ),
+
+            // end of profile image
+                  // bio display
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Text(
+                        "Bio",
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary
+                        ),
+                      ),
+                    ],
+                  ),
+                  Bio(text: user.bio),
+                ],
+              ),
+            )
+            );
+          }
+
+          // loading.... state ->
+          else if(state is ProfileLoading){
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator(),
+              ),
+            );
+          } else {
+            return const Center(child: Text("No Profile was found."),
+            );
+          }
+        },
+      );
+  }
+}
+/*
   // Fetch User Profile Data
   Future<void> _fetchUserProfile() async {
     try {
@@ -51,7 +159,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
       setState(() => _isLoading = false);
     }
   }
-
+  */ 
+/*
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -178,3 +287,4 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 }
+*/

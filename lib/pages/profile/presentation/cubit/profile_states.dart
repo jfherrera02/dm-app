@@ -17,7 +17,6 @@ class ProfileLoaded extends ProfileStates{
   ProfileLoaded(this.profileUser);
 }
 
-
 // errors
 class ProfileError extends ProfileStates{
   // same as loaded but use message

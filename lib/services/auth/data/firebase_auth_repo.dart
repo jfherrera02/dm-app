@@ -19,11 +19,22 @@ class FirebaseAuthRepo implements AuthRepo {
       UserCredential newuserCredential = await firebaseAuth
       .signInWithEmailAndPassword(email: email, password: password);
 
+      // now we can fetch the user data from firebase
+      // NOTE: we can also fetch the user data from firestore
+      // but for now we will use the firebase user data
+      // and later we will add the firestore data as well
+      // get the current logged in user via firebase
+
+      DocumentSnapshot userDoc = await firebaseFirestore
+      .collection("Users")
+      .doc(newuserCredential.user!.uid)
+      .get();
+
       // create the user
       AppUser user = AppUser(
         uid: newuserCredential.user!.uid, 
         email: email, 
-        username: '',
+        username: userDoc['username'],
         );    
       // finally, return the user
       return user;
@@ -64,10 +75,14 @@ class FirebaseAuthRepo implements AuthRepo {
   }
 
   // logout current user
-  @override
-  Future<void> newlogout() async {
-    firebaseAuth.signOut();
+@override
+Future<void> newlogout() async {
+  try {
+    await firebaseAuth.signOut();
+  } catch (e) {
+    throw Exception("Logout failed: $e");
   }
+}
 
   // fetch the current user
   @override
@@ -79,12 +94,22 @@ class FirebaseAuthRepo implements AuthRepo {
     if (firebaseUser == null) {
       return null;
     }
-    
+    // get the user data from firestore again
+    DocumentSnapshot userDoc = await firebaseFirestore
+    .collection("Users").doc(firebaseUser.uid).get();
+
+    // check if the user exists in firestore
+    if (!userDoc.exists) {
+      // if the user does not exist, we return null 
+      // NOTE: this should not happen, but we are just being safe
+      return null;
+    }
       // user exists, so we fetch
       return AppUser(
         uid: firebaseUser.uid, 
         email: firebaseUser.email!, 
-        username: '',
+        username: userDoc['username'],
+        // NOTE: we can also fetch the user data from firestore
         );
   }
 }

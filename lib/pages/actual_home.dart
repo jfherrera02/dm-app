@@ -1,8 +1,14 @@
 import 'package:dmessages/components/my_drawer.dart';
+import 'package:dmessages/components/post_tile.dart';
 import 'package:dmessages/pages/calendar_page.dart';
 import 'package:dmessages/pages/friends_page.dart';
 import 'package:dmessages/pages/profile_page.dart';
+import 'package:dmessages/post/presentation/cubits/post_cubit.dart';
+import 'package:dmessages/post/presentation/cubits/post_states.dart';
+import 'package:dmessages/post/presentation/pages/upload_post_page.dart';
+import 'package:dmessages/services/auth/presentation/cubits/auth_cubits.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 
 class ActualHome extends StatefulWidget {
@@ -13,22 +19,56 @@ class ActualHome extends StatefulWidget {
 }
 
 class _ActualHomeState extends State<ActualHome> {
-  int _selectedIndex = 0;
+  // grab the post cubit from the context
+  late final postCubit = context.read<PostCubit>();
 
-  // bottom nav bar
-  final List<Widget> _pages = [
-    const HomeFeed(), // Replaces placeholder text with HomeFeed
-    FriendPage(),
-    CalendarPage(),
-    // requires uid to view profiles 
-    // so before that we must get the 
-    // current user's id -->
-    //final user = context.read<AuthCubit>().currentUser; 
-    //UserProfilePage('1'),
-  ];
+  // on startup we can fetch the posts
+  @override
+  void initState() {
+    super.initState();
+    // fetch the posts from the backend
+    fetchAllPosts();
+  }
+
+  // fetch all posts from the backend
+  void fetchAllPosts() async {
+    // fetch all posts from the backend
+    await postCubit.fetchAllPosts();
+  }
+
+  // method to delete a post
+  void deletePost(String postId) async {
+    // delete the post from the backend
+    await postCubit.deletePost(postId);
+    // fetch all posts from the backend
+    await postCubit.fetchAllPosts();
+    // show a snackbar to inform the user that the post has been deleted
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Post deleted successfully"),
+      ),
+    );
+  }
+
+  // this is the index of the selected tab
+  int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
+    final user = context.read<AuthCubit>().newgetCurrentUser;
+    String? uid = user!.uid;
+
+    // bottom nav bar
+    final List<Widget> pages = [
+      const HomeFeed(), // Replaces placeholder text with HomeFeed
+      FriendPage(),
+      CalendarPage(),
+      // requires uid to view profiles 
+      // so before that we must get the 
+      // current user's id -->
+      UserProfilePage(uid: uid),
+    ];
+
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
@@ -36,12 +76,88 @@ class _ActualHomeState extends State<ActualHome> {
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.grey,
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications),
+            onPressed: () {
+              // Handle notification button press
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              // Handle settings button press
+            },
+          ),
+          // upload new post button
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => UploadPostPage(),
+              ),
+            ),
+            // Handle upload new post button press
+          ),
+        ],
       ),
       drawer: MyDrawer(),
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _pages,
-      ),
+
+      // New logic: only show BlocBuilder when Home tab is selected
+      body: _selectedIndex == 0
+          ? BlocBuilder<PostCubit, PostState>(
+              builder: (context, state) {
+                // the possible states are:
+                // 1. loading
+                if (state is PostLoading) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                // 2. loaded
+                else if (state is PostLoaded) {
+                  final allPosts = state.posts;
+
+                  // but if its empty we can show a message
+                  if (allPosts.isEmpty) {
+                    return const Center(
+                      child: Text("No posts available"),
+                    );
+                  }
+
+                  // otherwise we can show the posts
+                  // return a list view of the posts
+                  return ListView.builder(
+                    itemCount: allPosts.length,
+                    itemBuilder: (context, index) {
+                      final post = allPosts[index];
+                      return PostTile(
+                        post: post,
+                        onDeletePressed: () => deletePost(post.id),
+                      );
+                    },
+                  ); 
+                }
+                // 3. uploading
+                else if (state is PostUpload) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                // 4. error
+                else if (state is PostError) {
+                  return const Center(
+                    child: Text("Error loading posts"),
+                  );
+                } else {
+                  return const SizedBox();
+                }
+              },
+            )
+          // ⬇When another tab is selected, render the appropriate page
+          : pages[_selectedIndex],
+
       bottomNavigationBar: GNav(
         backgroundColor: Theme.of(context).colorScheme.secondary,
         gap: 8,
@@ -62,87 +178,14 @@ class _ActualHomeState extends State<ActualHome> {
   }
 }
 
+// This is a placeholder for the actual home feed page.
 class HomeFeed extends StatelessWidget {
   const HomeFeed({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        // Stories Section
-        SizedBox(
-          height: 100,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: 10,
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Column(
-                  children: [
-                    CircleAvatar(
-                      radius: 35,
-                      backgroundImage: AssetImage('assets/story_placeholder.png'),
-                    ),
-                    const SizedBox(height: 5),
-                    Text('User $index', style: TextStyle(fontSize: 12)),
-                  ],
-                ),
-              );
-            },
-          ),
-        ),
-        Expanded(
-          child: ListView.builder(
-            itemCount: 10,
-            itemBuilder: (context, index) {
-              return Card(
-                margin: const EdgeInsets.all(10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage: AssetImage('assets/user_placeholder.png'),
-                      ),
-                      title: Text('User $index'),
-                      subtitle: Text('2 hours ago'),
-                    ),
-                    // Image.asset('assets/post_placeholder.png', fit: BoxFit.cover),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.favorite_border),
-                            onPressed: () {},
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.comment),
-                            onPressed: () {},
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.share),
-                            onPressed: () {},
-                          ),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Text('Liked by User A and 100 others', style: TextStyle(fontWeight: FontWeight.bold)),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                      child: Text('User $index: This is a sample caption for the post!'),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ),
-      ],
+    return const Center(
+      child: Text("Home Feed"),
     );
   }
 }

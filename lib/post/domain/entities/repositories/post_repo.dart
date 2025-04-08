@@ -7,5 +7,7 @@ abstract class PostRepo{
   Future<void> createPost(Post post);
   Future<void> deletePost(String postId);
   // userid? or userId?
+  //  can be used to fetch posts by a specific user
+  //  or to fetch posts by a specific userId
   Future<List<Post>> fetchPostsByUserID(String userId);
 }
