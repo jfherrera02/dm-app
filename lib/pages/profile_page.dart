@@ -3,6 +3,8 @@ import 'package:dmessages/components/bio.dart';
 import 'package:dmessages/pages/profile/edit_profile.dart';
 import 'package:dmessages/pages/profile/presentation/cubit/profile_cubit.dart';
 import 'package:dmessages/pages/profile/presentation/cubit/profile_states.dart';
+import 'package:dmessages/post/presentation/cubits/post_cubit.dart';
+import 'package:dmessages/post/presentation/cubits/post_states.dart';
 import 'package:dmessages/services/auth/domain/app_user.dart';
 import 'package:dmessages/services/auth/presentation/cubits/auth_cubits.dart';
 import 'package:flutter/material.dart';
@@ -21,11 +23,17 @@ class UserProfilePage extends StatefulWidget {
 
 class _UserProfilePageState extends State<UserProfilePage> {
   // read in the cubits
-  late final authCubit = context.read<AuthCubit> ();
-  late final profileCubit = context.read<ProfileCubit>(); 
+  late final authCubit = context.read<AuthCubit>();
+  late final profileCubit = context.read<ProfileCubit>();
 
   // get the current user
   late AppUser? currentUser = authCubit.newgetCurrentUser;
+
+  // track the number of posts
+  int postCount = 0;
+
+  // track the number of friends
+  int friendCount = 0;
 
   @override
   void initState() {
@@ -69,69 +77,162 @@ class _UserProfilePageState extends State<UserProfilePage> {
               ],
             ),
             // body
-            body: Center(
+            // Use SingleChildScrollView to enable scrolling for a clean Instagram-like layout
+            body: SingleChildScrollView(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // username 
-                  Text(
-                    user.username,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary
+                  // Top profile header section similar to Instagram
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      children: [
+                        // profile image on left
+                        CachedNetworkImage(
+                          key: ValueKey(user.profileImageUrl), // forces a rebuild when URL changes
+                          imageUrl: user.profileImageUrl,
+                          placeholder: (context, url) => const CircularProgressIndicator(),
+                          errorWidget: (context, url, error) {
+                            debugPrint("Error loading image: $error");
+                            return Icon(
+                              Icons.person,
+                              size: 68,
+                              color: Theme.of(context).colorScheme.primary,
+                            );
+                          },
+                          imageBuilder: (context, imageProvider) => Container(
+                            width: 90,
+                            height: 90,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: DecorationImage(
+                                image: imageProvider,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        // statistics: posts, followers, following
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              // posts count
+                              Column(
+                                children: [
+                                  Text(
+                                    '$postCount',
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  const Text('Posts'),
+                                ],
+                              ),
+                              // friends count as placeholder for followers
+                              Column(
+                                children: [
+                                  Text(
+                                    '$friendCount',
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  const Text('Followers'),
+                                ],
+                              ),
+                              // For simplicity, duplicating friendCount for "Following"
+                              Column(
+                                children: [
+                                  Text(
+                                    '$friendCount',
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  const Text('Following'),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   
-                  // spacing 
-                  const SizedBox(height: 20),
-                  // followed by the profile picture:
-
-                  // THIS IS CRUCIAL ->
-                  // use the cached network image to load the profile image
-                  // and cache it for later use
-                  // (before implementing this, the profile image was not loading)
-                  // but it was already in the database
-                  // and the url was correct
-                  CachedNetworkImage(
-                    key: ValueKey(user.profileImageUrl), // forces a rebuild when URL changes
-                    imageUrl: user.profileImageUrl,
-                    placeholder: (context, url) => const CircularProgressIndicator(),
-                    errorWidget: (context, url, error) {
-                      debugPrint("Error loading image: $error");
-                      return Icon(
-                        Icons.person,
-                        size: 68,
-                        color: Theme.of(context).colorScheme.primary,
-                      );
-                    },
-                    imageBuilder: (context, imageProvider) => Container(
-                      width: 150,  // provide explicit width
-                      height: 150, // provide explicit height
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                          image: imageProvider,
-                          fit: BoxFit.cover,
+                  // Display username and bio similar to Instagram profile header
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // username 
+                        Text(
+                          user.username,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
                         ),
-                      ),
+                        const SizedBox(height: 8),
+                        // bio display
+                        Bio(text: user.bio),
+                      ],
                     ),
                   ),
-
-                  // end of profile image
-                  // bio display
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Text(
-                        "Bio",
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary
-                        ),
-                      ),
-                    ],
+                  
+                  const SizedBox(height: 16),
+                  const Divider(),
+                  
+                  // Show user posts in a grid similar to Instagram's post grid
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: BlocBuilder<PostCubit, PostState>(
+                      builder: (context, state) {
+                        // posts loaded state
+                        if (state is PostLoaded) {
+                          // filter the posts to only show the current user's posts
+                          final userPosts = state.posts.where((post) => post.userId == widget.uid).toList();
+                          postCount = userPosts.length; // update post count
+                          
+                          // Use GridView for an Instagram-like grid display (3 columns)
+                          return GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              crossAxisSpacing: 2,
+                              mainAxisSpacing: 2,
+                            ),
+                            itemCount: userPosts.length,
+                            itemBuilder: (context, index) {
+                              final post = userPosts[index];
+                              return CachedNetworkImage(
+                                imageUrl: post.imageUrl,
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) => Container(
+                                  color: Colors.grey[300],
+                                ),
+                                errorWidget: (context, url, error) => const Icon(Icons.error),
+                              );
+                            },
+                          );
+                        } else {
+                          return const Center(child: Text("Loading posts..."));
+                        }
+                      },
+                    ),
                   ),
-                  Bio(text: user.bio),
                 ],
               ),
-            )
+            ),
           );
         }
 

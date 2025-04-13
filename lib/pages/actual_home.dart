@@ -1,5 +1,5 @@
 import 'package:dmessages/components/my_drawer.dart';
-import 'package:dmessages/components/post_tile.dart';
+import 'package:dmessages/post/post_components/post_tile.dart';
 import 'package:dmessages/pages/calendar_page.dart';
 import 'package:dmessages/pages/friends_page.dart';
 import 'package:dmessages/pages/profile_page.dart';

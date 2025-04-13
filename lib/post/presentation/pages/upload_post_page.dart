@@ -83,6 +83,8 @@ class UploadPostPage extends StatefulWidget {
     text: _descriptionController.text,
     imageUrl: '',
     timestamp: DateTime.now(),
+    likes: [],
+    comments: [],
   );
   
   // ensure we upload using the post cubit
