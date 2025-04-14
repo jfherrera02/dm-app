@@ -22,6 +22,7 @@ class FirebaseProfileRepo implements ProfileRepository{
             username: userData['username'], 
             bio: userData['bio'] ?? '', // bio can be null so give ''
             profileImageUrl: userData['profileImageUrl'].toString(),
+            country: userData['country'] ?? '', // default to empty string if not present
             );
         }
       }

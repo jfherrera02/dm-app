@@ -1,4 +1,5 @@
 // bloc implementation of authentication
+import 'package:country_picker/country_picker.dart';
 import 'package:dmessages/services/auth/domain/app_user.dart';
 import 'package:dmessages/services/auth/presentation/auth_states.dart';
 import 'package:dmessages/services/auth/repo/auth_repo.dart';
@@ -57,13 +58,15 @@ class AuthCubit extends Cubit<AuthStates>{
   
 
   // register with the provided information
-  Future<void> newRegister(String userame, String email, String password) async {
+  Future<void> newRegister(String userame, String email, String password, String country) async {
     try {
       emit(AuthLoading());
       final user = await authRepo.newregisterWithEmailPassword(
         userame,
-        email, password);
-
+        email, password,
+        country, // default to USA for now
+      );
+      print("country in cubit: $country");
       // keep tracking if there is a user 
       if (user != null) {
         _newcurrentUser = user;

@@ -35,6 +35,7 @@ class FirebaseAuthRepo implements AuthRepo {
         uid: newuserCredential.user!.uid, 
         email: email, 
         username: userDoc['username'],
+        country: userDoc['country'], // default to empty string if not present
         );    
       // finally, return the user
       return user;
@@ -48,7 +49,7 @@ class FirebaseAuthRepo implements AuthRepo {
   // NOTE: can be changed later for future app updates
   // such as adding 'current_country' 
   @override
-  Future<AppUser?> newregisterWithEmailPassword(String name, String email, String password) async{
+  Future<AppUser?> newregisterWithEmailPassword(String name, String email, String password, String country) async{
     try {
       // register attempt
       UserCredential newuserCredential = await firebaseAuth
@@ -59,7 +60,9 @@ class FirebaseAuthRepo implements AuthRepo {
         uid: newuserCredential.user!.uid, 
         email: email, 
         username: name,
+        country: country, // default to empty string if not present
         );
+        print("country in firebase auth repo: $country");
       
       // also save user data in firestore 
       await firebaseFirestore
@@ -109,6 +112,7 @@ Future<void> newlogout() async {
         uid: firebaseUser.uid, 
         email: firebaseUser.email!, 
         username: userDoc['username'],
+        country: userDoc['country'] ?? '', // default to empty string if not present
         // NOTE: we can also fetch the user data from firestore
         );
   }

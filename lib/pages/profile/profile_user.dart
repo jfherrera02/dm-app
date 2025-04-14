@@ -12,6 +12,7 @@ class ProfileUser extends AppUser {
     required super.username,
     required this.bio,
     required this.profileImageUrl,
+    required super.country,
   });
 
   // now we implement the method to update the profile user 
@@ -22,6 +23,7 @@ class ProfileUser extends AppUser {
     username: username, 
     bio: newBio ?? bio, 
     profileImageUrl: newProfileImageUrl ?? profileImageUrl,
+    country: country, // keep the same country
     );
   }
 
@@ -34,6 +36,7 @@ class ProfileUser extends AppUser {
       'username' : username,
       'bio' : bio,
       'profileImageUrl' : profileImageUrl,
+      'country' : country,
     };
   }
 
@@ -45,6 +48,7 @@ class ProfileUser extends AppUser {
       username: jsonUser['username'],
       bio: jsonUser['bio'] ?? '',
       profileImageUrl: jsonUser['profileImageUrl'] ?? '',
+      country: jsonUser['country'] ?? '', // default to empty string if not present
     );
   }
 }

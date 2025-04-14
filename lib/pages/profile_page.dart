@@ -62,6 +62,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
           return Scaffold(
             appBar: AppBar(
               foregroundColor: Theme.of(context).colorScheme.primary,
+              // show the user's country flag or default if not available
+              title: user.country.isNotEmpty
+              ? Text(user.country, style: const TextStyle(fontSize: 18))
+              : const Icon(Icons.flag, size: 24),
               actions: [
                 // create an 'edit profile' button
                 IconButton(
@@ -87,7 +91,15 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     padding: const EdgeInsets.all(16.0),
                     child: Row(
                       children: [
+                        /*
+                        // show the user's country flag or default if not available
+                        if (user.country != '' && user.country.isNotEmpty)
+                          Text(user.country, style: const TextStyle(fontSize: 24)) // show country flag if available
+                        else
+                          const Icon(Icons.flag, size: 24), // default icon if no flag URL
+                        */
                         // profile image on left
+                        
                         CachedNetworkImage(
                           key: ValueKey(user.profileImageUrl), // forces a rebuild when URL changes
                           imageUrl: user.profileImageUrl,

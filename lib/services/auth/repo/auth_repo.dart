@@ -7,7 +7,7 @@ import 'package:dmessages/services/auth/domain/app_user.dart';
 abstract class AuthRepo {
   Future<AppUser?> newloginWithEmailPassword(String email, String password);
   Future<AppUser?> newregisterWithEmailPassword(
-    String username, String email, String password
+    String username, String email, String password, String country,
   );
   Future<void> newlogout();
   Future<AppUser?> newgetCurrentUser();
