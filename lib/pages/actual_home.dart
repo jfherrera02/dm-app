@@ -1,4 +1,5 @@
 import 'package:dmessages/components/my_drawer.dart';
+import 'package:dmessages/news/presentation/presentation/news_page.dart';
 import 'package:dmessages/post/post_components/post_tile.dart';
 import 'package:dmessages/pages/calendar_page.dart';
 import 'package:dmessages/pages/friends_page.dart';
@@ -61,6 +62,7 @@ class _ActualHomeState extends State<ActualHome> {
     // bottom nav bar
     final List<Widget> pages = [
       const HomeFeed(), // Replaces placeholder text with HomeFeed
+      NewsPage(uid: uid),
       FriendPage(),
       CalendarPage(),
       // requires uid to view profiles 
@@ -155,7 +157,7 @@ class _ActualHomeState extends State<ActualHome> {
                 }
               },
             )
-          // ⬇When another tab is selected, render the appropriate page
+          // When another tab is selected, render the appropriate page
           : pages[_selectedIndex],
 
       bottomNavigationBar: GNav(
@@ -169,6 +171,7 @@ class _ActualHomeState extends State<ActualHome> {
         },
         tabs: const [
           GButton(icon: Icons.home, text: 'Home'),
+          GButton(icon: Icons.article, text: 'News'),
           GButton(icon: Icons.people, text: 'Friends'),
           GButton(icon: Icons.event, text: 'Calendar'),
           GButton(icon: Icons.account_circle, text: 'Profile'),

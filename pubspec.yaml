@@ -44,7 +44,13 @@ dependencies:
   firebase_storage: ^12.4.5
   file_picker: ^10.0.0
   cached_network_image: ^3.4.1
-
+  # News API dependencies
+  dio: ^5.8.0+1
+  url_launcher: ^6.3.1
+  # Environment variables
+  # This package is used to load environment variables from a .env file.
+  flutter_dotenv: ^5.2.1
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -71,7 +77,8 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
   - assets/images/
-  
+  # env file
+  - assets/.env
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

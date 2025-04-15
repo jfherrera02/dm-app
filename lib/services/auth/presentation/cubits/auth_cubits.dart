@@ -1,5 +1,4 @@
 // bloc implementation of authentication
-import 'package:country_picker/country_picker.dart';
 import 'package:dmessages/services/auth/domain/app_user.dart';
 import 'package:dmessages/services/auth/presentation/auth_states.dart';
 import 'package:dmessages/services/auth/repo/auth_repo.dart';
