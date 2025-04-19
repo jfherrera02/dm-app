@@ -50,6 +50,8 @@ dependencies:
   # Environment variables
   # This package is used to load environment variables from a .env file.
   flutter_dotenv: ^5.2.1
+  # Display time since a post was created/ other time related functions
+  timeago: ^3.2.2
   
 dev_dependencies:
   flutter_test:

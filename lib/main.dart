@@ -1,5 +1,5 @@
 import 'package:dmessages/features/data/firebase_storage_repository.dart';
-import 'package:dmessages/pages/actual_home.dart';
+import 'package:dmessages/post/presentation/pages/actual_home.dart';
 import 'package:dmessages/pages/profile/data/firebase_profile_repo.dart';
 import 'package:dmessages/pages/profile/presentation/cubit/profile_cubit.dart';
 import 'package:dmessages/post/data/firebase_post_repo.dart';

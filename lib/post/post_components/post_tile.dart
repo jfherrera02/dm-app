@@ -314,7 +314,7 @@ class _PostTileState extends State<PostTile> {
               )
             ),
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(2.0),
               child: Row(
                 // In the top section include:
                 // 1. Profile image of the user who posted the post
@@ -322,7 +322,7 @@ class _PostTileState extends State<PostTile> {
                 // 3. Delete button (if the post is owned by the current user)
                 
                 // name of the user who posted the post
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   // profile image of the user who posted the post
                   postUser?.profileImageUrl != null ?
@@ -343,6 +343,7 @@ class _PostTileState extends State<PostTile> {
                     ),
                   ) : const Icon(Icons.person),
                   // name of the user who posted the post
+                  const SizedBox(width: 10),
                   Text(
                     widget.post.userName,
                     style: const TextStyle(
@@ -353,6 +354,8 @@ class _PostTileState extends State<PostTile> {
                   ),
                   // only show if its the user's post
                   // delete button
+                  // align to the right
+                  const Spacer(),
                   if (isOwnPost) 
                   IconButton(
                     icon: const Icon(Icons.delete),

@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 ThemeData darkMode = ThemeData(
   colorScheme: ColorScheme.dark(
-    surface: const Color.fromARGB(218, 0, 0, 0), // Deep maroon/burgundy-like background
-    primary: Colors.amber.shade400, // Golden-yellow accent for highlights
-    secondary: const Color.fromARGB(64, 128, 0, 32), // Dark brown for subtle contrast
-    tertiary: Colors.grey.shade300, // Light grey for input fields & borders
-    inversePrimary: Colors.white, // White for high contrast text/icons
+    surface: const Color(0xFF121212), // Soft black background (Instagram style)
+    primary: const Color(0xFF0095F6), // Instagram's bright blue accent
+    secondary: const Color(0xFF1F1F1F), // Darker grey for cards and containers
+    tertiary: const Color(0xFF9E9E9E), // Medium grey for borders and disabled text
+    inversePrimary: Colors.white, // White for text and icons
   ),
 );
