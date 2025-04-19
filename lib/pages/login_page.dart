@@ -1,4 +1,5 @@
 import 'package:dmessages/components/my_button.dart';
+import 'package:dmessages/responsive/constrained_scaffold.dart';
 import 'package:dmessages/services/auth/presentation/cubits/auth_cubits.dart';
 import 'package:flutter/material.dart';
 import 'package:dmessages/components/my_textfield.dart';
@@ -53,7 +54,7 @@ class LoginPageState extends State<LoginPage> {
   // Begin building the UI
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return ConstrainedScaffold(
       // Body
       body: SafeArea(
         child: Padding(

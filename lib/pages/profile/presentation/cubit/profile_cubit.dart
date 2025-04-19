@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:dmessages/features/domain/storage_repository.dart';
 import 'package:dmessages/pages/profile/presentation/cubit/profile_states.dart';
-import 'package:dmessages/pages/profile/profile_user.dart';
+import 'package:dmessages/pages/profile/data/profile_user.dart';
 import 'package:dmessages/pages/profile/repos/profile_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

@@ -1,6 +1,6 @@
 // Define all the different operations we can do for the user profile
 
-import 'package:dmessages/pages/profile/profile_user.dart';
+import 'package:dmessages/pages/profile/data/profile_user.dart';
 
 abstract class ProfileRepository {
   Future<ProfileUser?> fetchUserProfile(String uid);

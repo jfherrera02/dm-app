@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dmessages/pages/profile/profile_user.dart';
+import 'package:dmessages/pages/profile/data/profile_user.dart';
 import 'package:dmessages/pages/profile/repos/profile_repository.dart';
 
 class FirebaseProfileRepo implements ProfileRepository{

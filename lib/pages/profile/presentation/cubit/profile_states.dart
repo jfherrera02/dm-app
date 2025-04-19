@@ -1,5 +1,5 @@
 // track the profile states
-import 'package:dmessages/pages/profile/profile_user.dart';
+import 'package:dmessages/pages/profile/data/profile_user.dart';
 
 abstract class ProfileStates {}
 

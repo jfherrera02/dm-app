@@ -1,9 +1,9 @@
 import 'dart:developer' as developer;
-
+import 'package:timeago/timeago.dart' as timeago;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dmessages/pages/profile/presentation/cubit/profile_cubit.dart';
-import 'package:dmessages/pages/profile/profile_user.dart';
-import 'package:dmessages/pages/profile_page.dart';
+import 'package:dmessages/pages/profile/data/profile_user.dart';
+import 'package:dmessages/pages/profile/presentation/cubit/profile_page.dart';
 import 'package:dmessages/post/domain/entities/post.dart';
 import 'package:dmessages/post/domain/entities/post_comments.dart';
 import 'package:dmessages/post/presentation/cubits/post_cubit.dart';
@@ -211,6 +211,8 @@ class _PostTileState extends State<PostTile> {
                         // showing a placeholder icon for commenter's profile image handled via PostUser
                         leading: postUser?.profileImageUrl != null
                             ? CachedNetworkImage(
+                                // use the profile image URL of the commenter
+                                // match username with database usernames to access their corresponding profile image
                                 imageUrl: postUser!.profileImageUrl,
                                 width: 30,
                                 height: 30,
@@ -245,6 +247,8 @@ class _PostTileState extends State<PostTile> {
                           controller: commentController,
                           decoration: const InputDecoration(
                             hintText: "Add a comment...",
+                            contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                            // lower opacity for the text field background
                           ),
                         ),
                       ),
@@ -277,7 +281,7 @@ class _PostTileState extends State<PostTile> {
       final newComment = PostComments(
         postId: widget.post.id,
         id: DateTime.now().millisecondsSinceEpoch.toString(),
-        username: widget.post.userName, // or use currentUser!.username if preferred
+        username: currentUser!.username, // or use currentUser!.username if preferred
         text: commentText,
         timestamp: DateTime.now(),
       );
@@ -346,9 +350,9 @@ class _PostTileState extends State<PostTile> {
                   const SizedBox(width: 10),
                   Text(
                     widget.post.userName,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w500,
                       // align to the left
                     ),
                   ),
@@ -378,90 +382,105 @@ class _PostTileState extends State<PostTile> {
           ),
 
           // post description
+          // align to the left
           Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              widget.post.text,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
+            padding: const EdgeInsets.only(top: 8.0, left: 8.0),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                widget.post.text,
+                textAlign: TextAlign.left,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w200,
+                ),
               ),
             ),
           ),
 
           // like button 
           // this will be a heart icon that will change color when pressed
-          Row(
-            children: [
-              MouseRegion(
-                cursor: SystemMouseCursors.click,
-                child: GestureDetector(
-                  onTap: onLikePressed,
-                  child: Icon(
-                    widget.post.likes.contains(currentUser!.uid)
-                      ? Icons.favorite
-                      : Icons.favorite_border,
-                    color: widget.post.likes.contains(currentUser!.uid)
-                      ? Colors.red
-                      : Colors.grey,
+          Padding(
+            padding: const EdgeInsets.only(left: 6.0),
+            child: Row(
+              children: [
+                MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: GestureDetector(
+                    onTap: onLikePressed,
+                    child: Icon(
+                      widget.post.likes.contains(currentUser!.uid)
+                        ? Icons.favorite
+                        : Icons.favorite_border,
+                      color: widget.post.likes.contains(currentUser!.uid)
+                        ? Colors.red
+                        : Colors.grey,
+                    ),
                   ),
                 ),
-              ),
+                
+                // number of likes
+                // this will be a text that will show the number of likes
+                MouseRegion(
+                  cursor: SystemMouseCursors.text,
+                  child: Text(
+                    "${widget.post.likes.length}",
+                    style: const TextStyle(
+                      fontSize: 14,
+                      // color: Colors.grey,
+                    ),
+                  ),
+                ),
               
-              // number of likes
-              // this will be a text that will show the number of likes
-              MouseRegion(
-                cursor: SystemMouseCursors.text,
-                child: Text(
-                  "${widget.post.likes.length}",
+                // comment button
+                // this will be a button that will take the user to the comments page
+                IconButton(
+                  icon: const Icon(Icons.comment),
+                  // Updated to open modal bottom sheet for comments instead of alert dialog
+                  onPressed: openCommentsModalSheet,
+                  color: Colors.grey,
+                ),
+            
+                // show comment count
+                Text(
+                  widget.post.comments.length.toString(),
                   style: const TextStyle(
                     fontSize: 14,
-                    color: Colors.grey,
+                    // color: Colors.grey,
+                  ),
+                ),   
+            
+                // share button
+                // this will be a button that will take the user to the share page
+                // will be a placeholder for now
+                IconButton(
+                  icon: const Icon(Icons.send),
+                  onPressed: () {},
+                  color: Colors.grey,
+                ),
+                
+                // spacing
+                const SizedBox(height: 10),
+                
+                // timestamp of the post
+                // and display the time passed since the post was created
+                const Spacer(),
+                Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: Text(
+                    // use timeago package to show the time passed since the post was created
+                    // if the timestamp is null then show "Just now"
+                    widget.post.timestamp != null 
+                      ? timeago.format(widget.post.timestamp)
+                      : "Just now",
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey,
+                    ),
                   ),
                 ),
-              ),
-            
-              // comment button
-              // this will be a button that will take the user to the comments page
-              IconButton(
-                icon: const Icon(Icons.comment),
-                // Updated to open modal bottom sheet for comments instead of alert dialog
-                onPressed: openCommentsModalSheet,
-                color: Colors.grey,
-              ),
-
-              // show comment count
-              Text(
-                widget.post.comments.length.toString(),
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey,
-                ),
-              ),   
-
-              // share button
-              // this will be a button that will take the user to the share page
-              // will be a placeholder for now
-              IconButton(
-                icon: const Icon(Icons.send),
-                onPressed: () {},
-                color: Colors.grey,
-              ),
-              
-              // spacing
-              const SizedBox(height: 10),
-              
-              // timestamp of the post
-              // and display the time passed since the post was created
-              const Spacer(),
-              Text(
-                "${widget.post.timestamp.day}/${widget.post.timestamp.month}/${widget.post.timestamp.year}",
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
           // show the comments section
           // start with a caption of the comments

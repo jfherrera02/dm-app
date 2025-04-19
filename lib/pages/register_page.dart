@@ -1,4 +1,5 @@
 import 'package:country_picker/country_picker.dart';
+import 'package:dmessages/responsive/constrained_scaffold.dart';
 import 'package:dmessages/services/auth/presentation/cubits/auth_cubits.dart';
 import 'package:flutter/material.dart';
 import 'package:dmessages/components/my_button.dart';
@@ -109,8 +110,8 @@ class _RegisterPageState extends State<RegisterPage> {
   
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
+    return ConstrainedScaffold(
+      // backgroundColor: Theme.of(context).colorScheme.surface,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

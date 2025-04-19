@@ -1,10 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dmessages/components/bio.dart';
-import 'package:dmessages/pages/profile/edit_profile.dart';
+import 'package:dmessages/pages/profile/presentation/cubit/edit_profile.dart';
 import 'package:dmessages/pages/profile/presentation/cubit/profile_cubit.dart';
 import 'package:dmessages/pages/profile/presentation/cubit/profile_states.dart';
 import 'package:dmessages/post/presentation/cubits/post_cubit.dart';
 import 'package:dmessages/post/presentation/cubits/post_states.dart';
+import 'package:dmessages/responsive/constrained_scaffold.dart';
 import 'package:dmessages/services/auth/domain/app_user.dart';
 import 'package:dmessages/services/auth/presentation/cubits/auth_cubits.dart';
 import 'package:flutter/material.dart';
@@ -59,7 +60,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
           Future.delayed(Duration.zero, () {
             CachedNetworkImage.evictFromCache(user.profileImageUrl);
           });
-          return Scaffold(
+          return ConstrainedScaffold(
             appBar: AppBar(
               foregroundColor: Theme.of(context).colorScheme.primary,
               // show the user's country flag or default if not available

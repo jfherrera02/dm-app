@@ -1,11 +1,12 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dmessages/responsive/constrained_scaffold.dart';
 import 'package:flutter/foundation.dart' show kIsWeb; // says whether current platform is web or not
 import 'package:dmessages/components/my_textfield.dart';
 import 'package:dmessages/pages/profile/presentation/cubit/profile_cubit.dart';
 import 'package:dmessages/pages/profile/presentation/cubit/profile_states.dart';
-import 'package:dmessages/pages/profile/profile_user.dart';
+import 'package:dmessages/pages/profile/data/profile_user.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -121,7 +122,7 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   Widget buildEditPage() {
-    return Scaffold(
+    return ConstrainedScaffold(
       appBar: AppBar(
         title: const Text("Edit Profile"),
         foregroundColor: Theme.of(context).colorScheme.primary,

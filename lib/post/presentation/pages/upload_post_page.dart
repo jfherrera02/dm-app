@@ -4,6 +4,7 @@ import 'package:dmessages/components/my_textfield.dart';
 import 'package:dmessages/post/domain/entities/post.dart';
 import 'package:dmessages/post/presentation/cubits/post_cubit.dart';
 import 'package:dmessages/post/presentation/cubits/post_states.dart';
+import 'package:dmessages/responsive/constrained_scaffold.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:dmessages/services/auth/domain/app_user.dart';
 import 'package:dmessages/services/auth/presentation/cubits/auth_cubits.dart';
@@ -151,7 +152,7 @@ class UploadPostPage extends StatefulWidget {
   }
 
   Widget buildUploadPage() {
-    return Scaffold(
+    return ConstrainedScaffold(
       appBar: AppBar(
         title: const Text("Create a Post"),
         actions: [

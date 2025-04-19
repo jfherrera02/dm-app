@@ -3,10 +3,11 @@ import 'package:dmessages/news/presentation/presentation/news_page.dart';
 import 'package:dmessages/post/post_components/post_tile.dart';
 import 'package:dmessages/pages/calendar_page.dart';
 import 'package:dmessages/pages/friends_page.dart';
-import 'package:dmessages/pages/profile_page.dart';
+import 'package:dmessages/pages/profile/presentation/cubit/profile_page.dart';
 import 'package:dmessages/post/presentation/cubits/post_cubit.dart';
 import 'package:dmessages/post/presentation/cubits/post_states.dart';
 import 'package:dmessages/post/presentation/pages/upload_post_page.dart';
+import 'package:dmessages/responsive/constrained_scaffold.dart';
 import 'package:dmessages/services/auth/presentation/cubits/auth_cubits.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -71,8 +72,8 @@ class _ActualHomeState extends State<ActualHome> {
       UserProfilePage(uid: uid),
     ];
 
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
+    return ConstrainedScaffold(
+      // backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         title: const Text("Tether"),
         backgroundColor: Colors.transparent,
