@@ -65,7 +65,6 @@ class AuthCubit extends Cubit<AuthStates>{
         email, password,
         country, // default to USA for now
       );
-      print("country in cubit: $country");
       // keep tracking if there is a user 
       if (user != null) {
         _newcurrentUser = user;

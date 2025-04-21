@@ -3,8 +3,8 @@ import 'package:dmessages/services/auth/domain/app_user.dart';
 class ProfileUser extends AppUser {
   // new user info that we will change
   final String bio;
+  // final String profileImageUrl;
   final String profileImageUrl;
-
   // get all the data from the user 
   ProfileUser({
     required super.uid,
