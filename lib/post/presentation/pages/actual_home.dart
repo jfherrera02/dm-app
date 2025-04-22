@@ -66,45 +66,42 @@ class _ActualHomeState extends State<ActualHome> {
       NewsPage(uid: uid),
       FriendPage(),
       CalendarPage(),
-      // requires uid to view profiles 
-      // so before that we must get the 
+      // requires uid to view profiles
+      // so before that we must get the
       // current user's id -->
       UserProfilePage(uid: uid),
     ];
 
     return ConstrainedScaffold(
       // backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(
-        title: const Text("Tether"),
-        backgroundColor: Colors.transparent,
-        foregroundColor: Colors.grey,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications),
-            onPressed: () {
-              // Handle notification button press
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              // Handle settings button press
-            },
-          ),
-          // upload new post button
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => UploadPostPage(),
-              ),
+      appBar: _selectedIndex == 4
+          ? null
+          : // Hide AppBar on Profile Page
+          AppBar(
+              title: const Text("Tether"),
+              backgroundColor: Colors.transparent,
+              foregroundColor: Colors.grey,
+              elevation: 0,
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.notifications),
+                  onPressed: () {
+                    // Handle notification button press
+                  },
+                ),
+                // upload new post button
+                IconButton(
+                  icon: const Icon(Icons.add),
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => UploadPostPage(),
+                    ),
+                  ),
+                  // Handle upload new post button press
+                ),
+              ],
             ),
-            // Handle upload new post button press
-          ),
-        ],
-      ),
       drawer: MyDrawer(),
 
       // New logic: only show BlocBuilder when Home tab is selected
@@ -140,7 +137,7 @@ class _ActualHomeState extends State<ActualHome> {
                         onDeletePressed: () => deletePost(post.id),
                       );
                     },
-                  ); 
+                  );
                 }
                 // 3. uploading
                 else if (state is PostUpload) {

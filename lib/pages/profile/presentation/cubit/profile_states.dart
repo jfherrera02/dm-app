@@ -4,21 +4,20 @@ import 'package:dmessages/pages/profile/data/profile_user.dart';
 abstract class ProfileStates {}
 
 // initial state
-class ProfileInitial extends ProfileStates{}
+class ProfileInitial extends ProfileStates {}
 
 // loading... state
-class ProfileLoading extends ProfileStates{}
-
+class ProfileLoading extends ProfileStates {}
 
 // loaded state
-class ProfileLoaded extends ProfileStates{
+class ProfileLoaded extends ProfileStates {
   // if the profile is loaded ----> store it
   final ProfileUser profileUser;
   ProfileLoaded(this.profileUser);
 }
 
 // errors
-class ProfileError extends ProfileStates{
+class ProfileError extends ProfileStates {
   // same as loaded but use message
   final String message;
   ProfileError(this.message);

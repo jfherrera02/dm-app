@@ -33,7 +33,7 @@ class PostComments {
     return PostComments(
       postId: json['postId'],
       id: json['id'],
-      uid: json['uid'] ?? '', // default to empty string if null  
+      uid: json['uid'] ?? '', // default to empty string if null
       username: json['username'],
       text: json['text'],
       timestamp: DateTime.parse(json['timestamp']),

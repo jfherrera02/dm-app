@@ -12,12 +12,15 @@ class AuthService {
   }
 
   // Sign in an existing user with email and password
-  Future<UserCredential> signInWithEmailPassword(String email, String password) async {
+  Future<UserCredential> signInWithEmailPassword(
+      String email, String password) async {
     try {
-      UserCredential userCredential = await _auth.signInWithEmailAndPassword(email: email, password: password);
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+          email: email, password: password);
 
       // Ensure user document exists in Firestore (prevents overwriting existing data)
-      DocumentReference userDoc = _firestore.collection("Users").doc(userCredential.user!.uid);
+      DocumentReference userDoc =
+          _firestore.collection("Users").doc(userCredential.user!.uid);
       DocumentSnapshot docSnapshot = await userDoc.get();
 
       if (!docSnapshot.exists) {
@@ -39,9 +42,11 @@ class AuthService {
   }
 
   // Register a new user with email, password, and username
-  Future<UserCredential> signUpWithEmailAndPassword(String email, String password, String username) async {
+  Future<UserCredential> signUpWithEmailAndPassword(
+      String email, String password, String username) async {
     try {
-      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(email: email, password: password);
+      UserCredential userCredential = await _auth
+          .createUserWithEmailAndPassword(email: email, password: password);
 
       // Create Firestore document for the new user
       await _firestore.collection("Users").doc(userCredential.user!.uid).set({
@@ -96,7 +101,8 @@ class AuthService {
       User? currentUser = _auth.currentUser;
       if (currentUser == null) throw Exception("User not logged in");
 
-      DocumentReference receiverDoc = _firestore.collection("Users").doc(receiverUid);
+      DocumentReference receiverDoc =
+          _firestore.collection("Users").doc(receiverUid);
 
       await receiverDoc.update({
         'friendRequests': FieldValue.arrayUnion([currentUser.uid])
@@ -107,99 +113,109 @@ class AuthService {
   }
 
 // Fetch friend requests for the current user
-Future<List<Map<String, dynamic>>> getFriendRequests() async {
-  try {
-    User? currentUser = _auth.currentUser;
-    if (currentUser == null) throw Exception("User not logged in");
+  Future<List<Map<String, dynamic>>> getFriendRequests() async {
+    try {
+      User? currentUser = _auth.currentUser;
+      if (currentUser == null) throw Exception("User not logged in");
 
-    DocumentSnapshot userDoc = await _firestore.collection("Users").doc(currentUser.uid).get();
-    List<dynamic> friendRequests = userDoc['friendRequests'] ?? [];
+      DocumentSnapshot userDoc =
+          await _firestore.collection("Users").doc(currentUser.uid).get();
+      List<dynamic> friendRequests = userDoc['friendRequests'] ?? [];
 
-    List<Map<String, dynamic>> requestUsers = [];
-    for (String uid in friendRequests) {
-      DocumentSnapshot userSnapshot = await _firestore.collection("Users").doc(uid).get();
-      requestUsers.add({
-        'uid': uid,
-        'username': userSnapshot['username'],
-        'email': userSnapshot['email'],
-        'profileImageUrl': userSnapshot['profileImageUrl'] ?? '',
-      });
+      List<Map<String, dynamic>> requestUsers = [];
+      for (String uid in friendRequests) {
+        DocumentSnapshot userSnapshot =
+            await _firestore.collection("Users").doc(uid).get();
+        requestUsers.add({
+          'uid': uid,
+          'username': userSnapshot['username'],
+          'email': userSnapshot['email'],
+          'profileImageUrl': userSnapshot['profileImageUrl'] ?? '',
+        });
+      }
+
+      return requestUsers;
+    } catch (e) {
+      throw Exception("Error fetching friend requests: ${e.toString()}");
     }
-
-    return requestUsers;
-  } catch (e) {
-    throw Exception("Error fetching friend requests: ${e.toString()}");
   }
-}
 
 // Accept a friend request and create a chat room
-Future<void> acceptFriendRequest(String senderUid) async {
-  try {
-    User? currentUser = _auth.currentUser;
-    if (currentUser == null) throw Exception("User not logged in");
+  Future<void> acceptFriendRequest(String senderUid) async {
+    try {
+      User? currentUser = _auth.currentUser;
+      if (currentUser == null) throw Exception("User not logged in");
 
-    DocumentReference currentUserDoc = _firestore.collection("Users").doc(currentUser.uid);
-    DocumentReference senderDoc = _firestore.collection("Users").doc(senderUid);
+      DocumentReference currentUserDoc =
+          _firestore.collection("Users").doc(currentUser.uid);
+      DocumentReference senderDoc =
+          _firestore.collection("Users").doc(senderUid);
 
-    await _firestore.runTransaction((transaction) async {
-      DocumentSnapshot currentUserSnapshot = await transaction.get(currentUserDoc);
-      DocumentSnapshot senderSnapshot = await transaction.get(senderDoc);
+      await _firestore.runTransaction((transaction) async {
+        DocumentSnapshot currentUserSnapshot =
+            await transaction.get(currentUserDoc);
+        DocumentSnapshot senderSnapshot = await transaction.get(senderDoc);
 
-      List<dynamic> currentRequests = currentUserSnapshot['friendRequests'] ?? [];
-      List<dynamic> currentFriends = currentUserSnapshot['friends'] ?? [];
-      List<dynamic> senderFriends = senderSnapshot['friends'] ?? [];
+        List<dynamic> currentRequests =
+            currentUserSnapshot['friendRequests'] ?? [];
+        List<dynamic> currentFriends = currentUserSnapshot['friends'] ?? [];
+        List<dynamic> senderFriends = senderSnapshot['friends'] ?? [];
 
-      // Remove sender from friendRequests and add to friends
-      currentRequests.remove(senderUid);
-      currentFriends.add(senderUid);
-      senderFriends.add(currentUser.uid);
+        // Remove sender from friendRequests and add to friends
+        currentRequests.remove(senderUid);
+        currentFriends.add(senderUid);
+        senderFriends.add(currentUser.uid);
 
-      transaction.update(currentUserDoc, {
-        'friendRequests': currentRequests,
-        'friends': currentFriends,
+        transaction.update(currentUserDoc, {
+          'friendRequests': currentRequests,
+          'friends': currentFriends,
+        });
+
+        transaction.update(senderDoc, {
+          'friends': senderFriends,
+        });
+
+        // Create a new chat room between the two users
+        _createChatRoom(currentUser.uid, senderUid);
       });
-
-      transaction.update(senderDoc, {
-        'friends': senderFriends,
-      });
-
-      // Create a new chat room between the two users
-      _createChatRoom(currentUser.uid, senderUid);
-    });
-  } catch (e) {
-    throw Exception("Error accepting friend request: ${e.toString()}");
+    } catch (e) {
+      throw Exception("Error accepting friend request: ${e.toString()}");
+    }
   }
-}
 
 // Decline a friend request (simply remove from friendRequests)
-Future<void> declineFriendRequest(String senderUid) async {
-  try {
-    User? currentUser = _auth.currentUser;
-    if (currentUser == null) throw Exception("User not logged in");
+  Future<void> declineFriendRequest(String senderUid) async {
+    try {
+      User? currentUser = _auth.currentUser;
+      if (currentUser == null) throw Exception("User not logged in");
 
-    DocumentReference currentUserDoc = _firestore.collection("Users").doc(currentUser.uid);
-    await currentUserDoc.update({
-      'friendRequests': FieldValue.arrayRemove([senderUid]),
-    });
-  } catch (e) {
-    throw Exception("Error declining friend request: ${e.toString()}");
+      DocumentReference currentUserDoc =
+          _firestore.collection("Users").doc(currentUser.uid);
+      await currentUserDoc.update({
+        'friendRequests': FieldValue.arrayRemove([senderUid]),
+      });
+    } catch (e) {
+      throw Exception("Error declining friend request: ${e.toString()}");
+    }
   }
-}
 
 // Private method to create a chat room when a request is accepted
-Future<void> _createChatRoom(String user1, String user2) async {
-  String chatRoomId = (user1.hashCode <= user2.hashCode) ? "${user1}_$user2" : "${user2}_$user1";
+  Future<void> _createChatRoom(String user1, String user2) async {
+    String chatRoomId = (user1.hashCode <= user2.hashCode)
+        ? "${user1}_$user2"
+        : "${user2}_$user1";
 
-  DocumentReference chatRoomRef = _firestore.collection("chat_rooms").doc(chatRoomId);
-  DocumentSnapshot chatRoomSnapshot = await chatRoomRef.get();
+    DocumentReference chatRoomRef =
+        _firestore.collection("chat_rooms").doc(chatRoomId);
+    DocumentSnapshot chatRoomSnapshot = await chatRoomRef.get();
 
-  if (!chatRoomSnapshot.exists) {
-    await chatRoomRef.set({
-      'participants': [user1, user2],
-      'createdAt': FieldValue.serverTimestamp(),
-    });
+    if (!chatRoomSnapshot.exists) {
+      await chatRoomRef.set({
+        'participants': [user1, user2],
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+    }
   }
-}
 
   // Fetch the list of friends for the current user
   Future<List<Map<String, String>>> getFriendsList(String userId) async {
@@ -232,5 +248,4 @@ Future<void> _createChatRoom(String user1, String user2) async {
       return [];
     }
   }
-
 }

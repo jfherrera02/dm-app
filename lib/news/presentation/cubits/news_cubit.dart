@@ -14,7 +14,7 @@ class NewsCubit extends Cubit<NewsState> {
     required this.newsRepo,
     required this.storageRepo,
   }) : super(NewsInitial());
-  
+
   // now we can fetch news articles
   // for now we will display top US news articles
   Future<void> fetchNews() async {
@@ -29,5 +29,5 @@ class NewsCubit extends Cubit<NewsState> {
     } catch (e) {
       emit(NewsError("Failed fetching news: $e"));
     }
-  }  
+  }
 }

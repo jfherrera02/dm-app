@@ -38,7 +38,8 @@ class _CalendarPageState extends State<CalendarPage> {
   // Function to build the calendar grid
   Widget _buildCalendar() {
     final firstDayOfMonth = DateTime(_currentDate.year, _currentDate.month, 1);
-    final lastDayOfMonth = DateTime(_currentDate.year, _currentDate.month + 1, 0);
+    final lastDayOfMonth =
+        DateTime(_currentDate.year, _currentDate.month + 1, 0);
     final daysInMonth = lastDayOfMonth.day;
     final startingWeekday = firstDayOfMonth.weekday;
 

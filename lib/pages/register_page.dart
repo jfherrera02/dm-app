@@ -11,6 +11,7 @@ class RegisterPage extends StatefulWidget {
   final void Function()? onTap;
 
   const RegisterPage({super.key, required this.onTap});
+
   @override
   State<RegisterPage> createState() => _RegisterPageState();
 }
@@ -27,8 +28,7 @@ class _RegisterPageState extends State<RegisterPage> {
   // final _countryDisplayController is kept if needed for future use
   final _countryDisplayController = TextEditingController();
 
-  // method for regestering account
-  
+  // method for registering account
   void register() {
     final String username = _usernameController.text;
     final String email = _emailController.text;
@@ -37,12 +37,12 @@ class _RegisterPageState extends State<RegisterPage> {
     final String country = _countryController.text;
 
     // we need to obtain the authentication cubit to proceed
-    final authCubit = context.read<AuthCubit>(); 
+    final authCubit = context.read<AuthCubit>();
 
-    // ensure that the files are not empty for security: 
-    if (email.isNotEmpty && 
-        username.isNotEmpty && 
-        password.isNotEmpty && 
+    // ensure that the fields are not empty for security:
+    if (email.isNotEmpty &&
+        username.isNotEmpty &&
+        password.isNotEmpty &&
         confirmController.isNotEmpty &&
         country.isNotEmpty) {
       // now make sure that the passwords match before registering
@@ -53,16 +53,17 @@ class _RegisterPageState extends State<RegisterPage> {
       // passwords do not match so show error -->
       else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please complete every field available.")));
+          const SnackBar(content: Text("Please complete every field available.")),
+        );
       }
-    }
-    else {
+    } else {
       // empty fields
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please complete all of the fields.")));
+        const SnackBar(content: Text("Please complete all of the fields.")),
+      );
     }
   }
-  
+
   @override
   // now get rid of all used controllers ->
   void dispose() {
@@ -74,144 +75,141 @@ class _RegisterPageState extends State<RegisterPage> {
     _countryDisplayController.dispose();
     super.dispose();
   }
-  
-  /* OLD REGISTER METHOD: 
-  // get the authentication service
-  final auth = AuthService();
 
-  // both passwords must match
-  // for successful registration
-  if (_passwordController.text == _confirmController.text) {
-    try{
-          auth.signUpWithEmailAndPassword(
-    _emailController.text, 
-    _passwordController.text,
-    _usernameController.text,
-    );
-      } catch (e) {
-        showDialog(
-    context: context, 
-    builder: (context) => AlertDialog(
-      title: Text(e.toString()),
-    )
-  );
-      } 
-  }
-  // if passwords do not match -> advise user to fix
-  else {
-    showDialog(
-    context: context, 
-    builder: (context) => AlertDialog(
-      title: Text("The passwords do not match! Please make sure they are the same!"),
-    )
-  );
-  }
-  */
-  
   @override
   Widget build(BuildContext context) {
     return ConstrainedScaffold(
-      // backgroundColor: Theme.of(context).colorScheme.surface,
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // App logo
-            Image(image: AssetImage('assets/images/tether-icon.png'),
-                  width: 100, height: 100),
-            // Login Greeting Message
-            Text(
-              "Create Your Account",
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.primary,
-                fontSize: 16,
-              ),
+        child: Container(
+          // padding and margin just for breathing room
+          margin: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(16),
+
+          // this is your thin outline
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface, // background color
+            border: Border.all(
+              color: Colors.grey.shade400, // outline color
+              width: 1, // thinness of the line
             ),
+            borderRadius: BorderRadius.circular(8), // rounded corners
+          ),
 
-            const SizedBox(height: 25),
+          // now everything inside this box
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // App logo
+              Image.asset(
+                'assets/images/tether_text_black.png',
+                width: 200,
+                height: 200,
+              ),
 
-            // Country picker button
-            ElevatedButton(
-              onPressed: () {
-                showCountryPicker(
-                  context: context,
-                  showPhoneCode: false, // optional. Shows phone code before the country name.
-                  onSelect: (Country country) {
-                    // print('Select country: ${country.displayName}');
-                    // NEW: Update the country text field with the flag and country name
-                    setState(() {
-                      _countryController.text = "${country.flagEmoji} ${country.displayName}";
-                      _countryDisplayController.text = "${country.flagEmoji} ${country.displayName}";
-                      print('Selected country: ${_countryController.text}');
-                    });
-                  },
-                );
-              },
-              child: AbsorbPointer(
-                child: MyTextField(
-                  hintText: "Select Country",
-                  obscureText: false,
-                  controller: _countryController,
-                  // NEW (if supported by your MyTextField): set readOnly to true to prevent manual editing
-                  // readOnly: true,
+              const SizedBox(height: 16),
+
+              // Login Greeting Message
+              Text(
+                "Create Your Account",
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontSize: 16,
                 ),
               ),
-            ),
 
-            const SizedBox(height: 10),
-            
-            // email entry
-            MyTextField(
-              hintText: "Email",
-              obscureText: false,
-              controller: _emailController,
-            ),
-            const SizedBox(height: 10),
+              const SizedBox(height: 25),
 
-            // username entry
-            MyTextField(
-              hintText: "Username",
-              obscureText: false,
-              controller: _usernameController,
-            ),
-            const SizedBox(height: 10),
-            
-            // password
-            MyTextField(
-              hintText: "Password",
-              obscureText: true,
-              controller: _passwordController,
-            ),
-
-            const SizedBox(height: 10),
-            // password
-            MyTextField(
-              hintText: "Confirm Password",
-              obscureText: true,
-              controller: _confirmController,
-            ),
-
-            const SizedBox(height: 25),
-
-            // Register button
-            MyButton(
-              text: "Register", 
-              onTap: register,
-            ),
-            
-            const SizedBox(height: 25),
-
-            // Back to Login button
-            GestureDetector(
-              onTap: widget.onTap,
-              child: Text(
-                "Back to Login",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.primary), 
+              // Country picker button
+              ButtonTheme(
+                alignedDropdown: true,
+                child: MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: GestureDetector(
+                    onTap: () {
+                      showCountryPicker(
+                        context: context,
+                        showPhoneCode: false, // optional-> Shows phone code before the country name.
+                        onSelect: (Country country) {
+                          // Update the country text field with the flag and country name
+                          setState(() {
+                            _countryController.text =
+                                "${country.flagEmoji} ${country.displayName}";
+                            _countryDisplayController.text =
+                                "${country.flagEmoji} ${country.displayName}";
+                            // print('Selected country: ${_countryController.text}');
+                          });
+                        },
+                      );
+                    },
+                    child: AbsorbPointer(
+                      child: MyTextField(
+                        hintText: "Select Country",
+                        obscureText: false,
+                        controller: _countryController,
+                        // readOnly: true,
+                      ),
+                    ),
+                  ),
+                ),
               ),
-            ),
-          ]
+
+              const SizedBox(height: 10),
+
+              // email entry
+              MyTextField(
+                hintText: "Email",
+                obscureText: false,
+                controller: _emailController,
+              ),
+              const SizedBox(height: 10),
+
+              // username entry
+              MyTextField(
+                hintText: "Username",
+                obscureText: false,
+                controller: _usernameController,
+              ),
+              const SizedBox(height: 10),
+
+              // password
+              MyTextField(
+                hintText: "Password",
+                obscureText: true,
+                controller: _passwordController,
+              ),
+
+              const SizedBox(height: 10),
+
+              // confirm password
+              MyTextField(
+                hintText: "Confirm Password",
+                obscureText: true,
+                controller: _confirmController,
+              ),
+
+              const SizedBox(height: 25),
+
+              // Register button
+              MyButton(
+                text: "Register",
+                onTap: register,
+              ),
+
+              const SizedBox(height: 25),
+
+              // Back to Login button
+              GestureDetector(
+                onTap: widget.onTap,
+                child: Text(
+                  "Back to Login",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -71,7 +71,8 @@ class _FriendPageState extends State<FriendPage> {
               decoration: InputDecoration(
                 hintText: "Search by username...",
                 prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
               ),
               onChanged: _searchUsers,
             ),
@@ -90,7 +91,8 @@ class _FriendPageState extends State<FriendPage> {
                         leading: CircleAvatar(
                           backgroundImage: user['profileImageUrl'] != null
                               ? NetworkImage(user['profileImageUrl'])
-                              : AssetImage('assets/images/default_avatar.png') as ImageProvider,
+                              : AssetImage('assets/images/default_avatar.png')
+                                  as ImageProvider,
                         ),
                         title: Text(user['username']),
                         subtitle: Text(user['email']),
@@ -113,7 +115,8 @@ class _FriendPageState extends State<FriendPage> {
       stream: _chatService.getUsersStream(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return const Center(child: Text("Something went wrong. Please try again."));
+          return const Center(
+              child: Text("Something went wrong. Please try again."));
         }
 
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -134,7 +137,8 @@ class _FriendPageState extends State<FriendPage> {
   }
 
   // Build each user item, excluding the current user
-  Widget _buildUserListItem(Map<String, dynamic> userData, BuildContext context) {
+  Widget _buildUserListItem(
+      Map<String, dynamic> userData, BuildContext context) {
     final currentUserEmail = _authService.getCurrentUser()?.email;
 
     if (userData["email"] == currentUserEmail) {

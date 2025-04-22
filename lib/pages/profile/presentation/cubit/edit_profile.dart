@@ -1,8 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dmessages/responsive/constrained_scaffold.dart';
-import 'package:flutter/foundation.dart' show kIsWeb; // says whether current platform is web or not
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:dmessages/components/my_textfield.dart';
 import 'package:dmessages/pages/profile/presentation/cubit/profile_cubit.dart';
 import 'package:dmessages/pages/profile/presentation/cubit/profile_states.dart';
@@ -16,23 +15,23 @@ class EditProfile extends StatefulWidget {
   const EditProfile({
     super.key,
     required this.user,
-    });
+  });
 
   @override
   State<EditProfile> createState() => _EditProfileState();
 }
 
 class _EditProfileState extends State<EditProfile> {
-
   // UI to select an image (using file_picker)
   // mobile image
   PlatformFile? imageFilePicked;
 
   // web image
-  Uint8List? webImage; 
+  Uint8List? webImage;
 
   final textController = TextEditingController();
-  // pick the proper image to uplaod 
+
+  // pick the proper image to upload
   Future<void> pickImage() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.image,
@@ -42,79 +41,54 @@ class _EditProfileState extends State<EditProfile> {
     if (result != null) {
       setState(() {
         imageFilePicked = result.files.first;
-        debugPrint("Picked file extension: ${imageFilePicked!.extension}");
-        debugPrint("Picked file name: ${imageFilePicked!.name}");
-        
         if (kIsWeb) {
           webImage = imageFilePicked!.bytes;
-        }  
+        }
       });
     }
   }
 
   // update user profile when save button is pressed ->
   void updateProfile() async {
-    // get the profile cubit
     final profileCubit = context.read<ProfileCubit>();
-    // prepare to upload images
     final String uid = widget.user.uid;
 
-    // get the file name with extension
-    // this is necessary so that proper metadata (MIME type) can be applied during upload.
     final fileExtension = imageFilePicked?.extension ?? 'jpg';
     final fileNameWithExtension = '$uid.$fileExtension';
-
-    // are we looking at web or mobile?
     final mobileImagePath = kIsWeb ? null : imageFilePicked?.path;
-    final webImageBytes = kIsWeb ? imageFilePicked?.bytes : null; 
-    final String? newBio = textController.text.isNotEmpty ? textController.text : null;
+    final webImageBytes = kIsWeb ? imageFilePicked?.bytes : null;
+    final String? newBio =
+        textController.text.isNotEmpty ? textController.text : null;
 
-    // Determine file name with extension if an image is picked.
-    // This is necessary so that proper metadata (MIME type) can be applied during upload.
-
-
-    // update the profile if there is something to update (bio or image)
     if (imageFilePicked != null || newBio != null) {
       profileCubit.updateProfile(
         uid: uid,
         newBio: newBio,
         mobileImagePath: mobileImagePath,
         webImageBytes: webImageBytes,
-        fileName: fileNameWithExtension, // new parameter for file name with extension
+        fileName: fileNameWithExtension,
       );
-    }
-    // if there is nothing to update -> pop the page (go to previous page)
-    else {
+    } else {
       Navigator.pop(context);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // scaffold
     return BlocConsumer<ProfileCubit, ProfileStates>(
       builder: (context, state) {
-        // states when in bio editing
-        // profile loading....
         if (state is ProfileLoading) {
           return const Scaffold(
-            body: Column(
-              children: [
-                CircularProgressIndicator(),
-                Text("Saving changes..."),
-              ],
+            body: Center(
+              child: CircularProgressIndicator(),
             ),
           );
         } else {
-          return buildEditPage(); // return same page 
+          return buildEditPage(); // return same page
         }
-        // error state
-
-        // edit form
-      }, 
+      },
       listener: (context, state) {
         if (state is ProfileLoaded) {
-          // go to previous page after saving changes
           Navigator.pop(context);
         }
       },
@@ -128,87 +102,83 @@ class _EditProfileState extends State<EditProfile> {
         foregroundColor: Theme.of(context).colorScheme.primary,
         actions: [
           // save/upload
-          IconButton(
-            onPressed: updateProfile, 
-            icon: const Icon(Icons.save)
-          ),
+          IconButton(onPressed: updateProfile, icon: const Icon(Icons.check)),
         ],
       ),
-      body: Column(
-        children: [
-          // profile picture edit here
-          Center(
-            child: Container(
-              height: 200,
-              width: 200,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.secondary,
-                shape: BoxShape.circle,
-              ),
-              // image will stay in the bounds of the profile circle outline
-              clipBehavior: Clip.hardEdge,
-              // child container 
-              child: 
-                // 3 display options:
-                // selected mobile image
-                (!kIsWeb && imageFilePicked != null) 
-                ? 
-                Image.file(
-                  File(imageFilePicked!.path!),
-                  fit: BoxFit.cover,
-                )
-                :
-                // web image
-                (kIsWeb && webImage != null)
-                ?
-                // return image
-                Image.memory(webImage!)
-                : 
-                // no image selected -> current image is displayed
-                // use the cached_network_image dependency from fluttter pub
-                // great for loading image or chaching image (save to local storage)
-                // eliminates need to fetch every time
-                CachedNetworkImage(
-                  imageUrl: widget.user.profileImageUrl,
-                  // when loading.... ->
-                  placeholder: (context, url) => 
-                    const CircularProgressIndicator(),
-                  // in case of an error ->
-                  errorWidget: (context, url, error) => 
-                    Icon(
-                      Icons.person,
-                      size: 68,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // profile picture edit here
+            GestureDetector(
+              onTap: pickImage,
+              child: Stack(
+                alignment: Alignment.bottomRight,
+                children: [
+                  Container(
+                    width: 140,
+                    height: 140,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Theme.of(context).colorScheme.secondary,
+                      image: DecorationImage(
+                        // display selected or current image
+                        image: imageFilePicked != null
+                            ? (kIsWeb
+                                ? MemoryImage(webImage!)
+                                : FileImage(File(imageFilePicked!.path!)) as ImageProvider)
+                            : NetworkImage(widget.user.profileImageUrl),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  // edit icon overlay
+                  CircleAvatar(
+                    radius: 18,
+                    backgroundColor: Theme.of(context).colorScheme.surface,
+                    child: Icon(
+                      Icons.camera_alt,
                       color: Theme.of(context).colorScheme.primary,
                     ),
-                  // when loaded:
-                  imageBuilder: (context, imageProvider) => Image(
-                    image: imageProvider,
                   ),
-                  // now ensure the image fills up the profile image area
-                  fit: BoxFit.cover,
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            // bio edit here
+            Align(
+               alignment: Alignment.topCenter,
+              child: Text(
+                "Bio",
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ),
+            const SizedBox(height: 8),
+            MyTextField(
+              hintText: widget.user.bio,
+              obscureText: false,
+              controller: textController,
+            ),
+            const SizedBox(height: 24),
+            // finally implement the button to pick an image
+            SizedBox(
+              // width: double.infinity,
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  splashFactory: NoSplash.splashFactory,
+                  side: BorderSide.none,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
+                onPressed: pickImage,
+                icon: const Icon(Icons.photo_library),
+                label: const Text("Change Photo"),
+              ),
             ),
-          ),
-          
-          const SizedBox(height: 25),
-          // bio edit here
-          const Text("Edit Your Bio"),
-
-          // finally implement the button to pick an image
-          Center(
-            child: MaterialButton(
-              onPressed: pickImage,
-              color: Colors.blue,
-              child: const Text("Change Profile Image"),
-            ),
-          ),
-
-          MyTextField(
-            hintText: widget.user.bio, 
-            obscureText: false, 
-            controller: textController
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

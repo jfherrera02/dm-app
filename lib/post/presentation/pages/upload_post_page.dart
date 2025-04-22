@@ -18,11 +18,11 @@ class UploadPostPage extends StatefulWidget {
   @override
   State<UploadPostPage> createState() => _UploadPostPageState();
 }
-  // this page will be used to upload a new post
-  // mobile image pick
-  class _UploadPostPageState extends State<UploadPostPage> {  
-  PlatformFile? _imageFile;
 
+// this page will be used to upload a new post
+// mobile image pick
+class _UploadPostPageState extends State<UploadPostPage> {
+  PlatformFile? _imageFile;
 
   // we image picker for web platforms
 
@@ -31,7 +31,7 @@ class UploadPostPage extends StatefulWidget {
 
   // text controller for the post description
   final TextEditingController _descriptionController = TextEditingController();
-  
+
   // current user
   // this is the current user that will be used to upload the image to the backend
   AppUser? _currentUser;
@@ -41,15 +41,16 @@ class UploadPostPage extends StatefulWidget {
     // this is the current user that will be used to upload the image to the backend
     getCurrentUser();
   }
-   // now get the current user
-   void getCurrentUser() async {
-      // this is the current user that will be used to upload the image to the backend
-      final authCubit = context.read<AuthCubit>();  
-      _currentUser = authCubit.newgetCurrentUser;
-   }
 
-   // select image
-   Future<void> pickImage() async {
+  // now get the current user
+  void getCurrentUser() async {
+    // this is the current user that will be used to upload the image to the backend
+    final authCubit = context.read<AuthCubit>();
+    _currentUser = authCubit.newgetCurrentUser;
+  }
+
+  // select image
+  Future<void> pickImage() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.image,
       withData: kIsWeb,
@@ -61,7 +62,7 @@ class UploadPostPage extends StatefulWidget {
 
         if (kIsWeb) {
           webImage = _imageFile!.bytes;
-        }  
+        }
       });
     }
   }
@@ -76,42 +77,44 @@ class UploadPostPage extends StatefulWidget {
       return;
     }
 
-  // now we can create a new post object 
-  final newPost = Post(
-    id: DateTime.now().millisecondsSinceEpoch.toString(),
-    userId: _currentUser!.uid,
-    userName: _currentUser!.username,
-    text: _descriptionController.text,
-    imageUrl: '',
-    timestamp: DateTime.now(),
-    likes: [],
-    comments: [],
-  );
-  
-  // ensure we upload using the post cubit
-  final postCubit = context.read<PostCubit>();
+    // now we can create a new post object
+    final newPost = Post(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      userId: _currentUser!.uid,
+      userName: _currentUser!.username,
+      text: _descriptionController.text,
+      imageUrl: '',
+      timestamp: DateTime.now(),
+      likes: [],
+      comments: [],
+    );
 
-  // case for web upload
-  if (kIsWeb) {
-    // upload the image to the backend
-    await postCubit.createPost(
-      newPost,
-      imageBytes: _imageFile?.bytes,
-    );
-  } else {
-    // upload the image to the backend
-    await postCubit.createPost(
-      newPost,
-      imagePath: _imageFile!.path,
-    );
+    // ensure we upload using the post cubit
+    final postCubit = context.read<PostCubit>();
+
+    // case for web upload
+    if (kIsWeb) {
+      // upload the image to the backend
+      await postCubit.createPost(
+        newPost,
+        imageBytes: _imageFile?.bytes,
+      );
+    } else {
+      // upload the image to the backend
+      await postCubit.createPost(
+        newPost,
+        imagePath: _imageFile!.path,
+      );
+    }
   }
-}
+
   // now we can dispose of the controllers
   @override
   void dispose() {
     _descriptionController.dispose();
     super.dispose();
   }
+
   // create the UI for the upload post page
   @override
   Widget build(BuildContext context) {
@@ -148,7 +151,7 @@ class UploadPostPage extends StatefulWidget {
           );
         }
       },
-    ); 
+    );
   }
 
   Widget buildUploadPage() {
@@ -168,8 +171,7 @@ class UploadPostPage extends StatefulWidget {
           children: [
             // image preview
             // web image preview
-            if (kIsWeb && webImage != null)
-              Image.memory(webImage!),
+            if (kIsWeb && webImage != null) Image.memory(webImage!),
             // mobile image preview
             if (!kIsWeb && _imageFile != null)
               Image.file(
@@ -183,7 +185,7 @@ class UploadPostPage extends StatefulWidget {
               controller: _descriptionController,
               hintText: "Write a caption...",
               obscureText: false,
-              ),
+            ),
             // button to select image
             ElevatedButton(
               onPressed: pickImage,

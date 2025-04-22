@@ -67,7 +67,8 @@ class _PostTileState extends State<PostTile> {
 
   // fetch the post author's profile
   Future<void> fetchPostUser() async {
-    final fetchedUser = await profileCubit.getCurrentUserProfile(widget.post.userId);
+    final fetchedUser =
+        await profileCubit.getCurrentUserProfile(widget.post.userId);
     if (fetchedUser != null) {
       setState(() {
         postUser = fetchedUser;
@@ -111,7 +112,9 @@ class _PostTileState extends State<PostTile> {
         widget.post.likes.add(currentUser!.uid);
       }
     });
-    postCubit.toggleLikePost(widget.post.id, currentUser!.uid).catchError((error) {
+    postCubit
+        .toggleLikePost(widget.post.id, currentUser!.uid)
+        .catchError((error) {
       setState(() {
         if (isLiked) {
           widget.post.likes.add(currentUser!.uid);
@@ -171,25 +174,31 @@ class _PostTileState extends State<PostTile> {
                             final comment = widget.post.comments[index];
                             final commenter = userMap[comment.uid];
                             return ListTile(
-                              leading: (commenter?.profileImageUrl ?? '').isNotEmpty
+                              leading: (commenter?.profileImageUrl ?? '')
+                                      .isNotEmpty
                                   ? CachedNetworkImage(
                                       imageUrl: commenter!.profileImageUrl,
                                       imageBuilder: (ctx, img) => CircleAvatar(
                                         radius: 15,
                                         backgroundImage: img,
                                       ),
-                                      placeholder: (_, __) => const CircularProgressIndicator(strokeWidth: 2),
-                                      errorWidget: (_, __, ___) => const Icon(Icons.error),
+                                      placeholder: (_, __) =>
+                                          const CircularProgressIndicator(
+                                              strokeWidth: 2),
+                                      errorWidget: (_, __, ___) =>
+                                          const Icon(Icons.error),
                                     )
                                   : const Icon(Icons.person),
                               title: Text(
                                 comment.username,
-                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 12),
                               ),
                               subtitle: Text(comment.text),
                               trailing: Text(
                                 timeago.format(comment.timestamp),
-                                style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                style: const TextStyle(
+                                    fontSize: 12, color: Colors.grey),
                               ),
                             );
                           },
@@ -216,7 +225,8 @@ class _PostTileState extends State<PostTile> {
                             hintText: 'Add a comment...',
                             filled: true,
                             fillColor: Colors.grey.withOpacity(0.1),
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16.0, vertical: 8.0),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(20.0),
                               borderSide: BorderSide.none,
@@ -257,7 +267,9 @@ class _PostTileState extends State<PostTile> {
       setState(() {
         widget.post.comments.add(newComment);
       });
-      postCubit.addCommentToPost(widget.post.id, newComment).catchError((error) {
+      postCubit
+          .addCommentToPost(widget.post.id, newComment)
+          .catchError((error) {
         setState(() {
           widget.post.comments.remove(newComment);
         });
@@ -312,7 +324,8 @@ class _PostTileState extends State<PostTile> {
                   postUser?.profileImageUrl != null
                       ? CachedNetworkImage(
                           imageUrl: postUser!.profileImageUrl,
-                          errorWidget: (context, url, error) => const Icon(Icons.error),
+                          errorWidget: (context, url, error) =>
+                              const Icon(Icons.error),
                           imageBuilder: (context, imageProvider) => Container(
                             width: 30,
                             height: 30,
@@ -350,7 +363,8 @@ class _PostTileState extends State<PostTile> {
             height: 400,
             width: double.infinity,
             fit: BoxFit.cover,
-            placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+            placeholder: (context, url) =>
+                const Center(child: CircularProgressIndicator()),
             errorWidget: (context, url, error) => const Icon(Icons.error),
           ),
           Padding(
@@ -379,7 +393,9 @@ class _PostTileState extends State<PostTile> {
                       widget.post.likes.contains(currentUser!.uid)
                           ? Icons.favorite
                           : Icons.favorite_border,
-                      color: widget.post.likes.contains(currentUser!.uid) ? Colors.red : Colors.grey,
+                      color: widget.post.likes.contains(currentUser!.uid)
+                          ? Colors.red
+                          : Colors.grey,
                     ),
                   ),
                 ),

@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 
 class FirebaseStorageRepository implements StorageRepository {
   final FirebaseStorage storage = FirebaseStorage.instance;
-  
 
   // Mobile - file upload
   // this method will be used to upload the profile image from mobile devices
@@ -21,11 +20,12 @@ class FirebaseStorageRepository implements StorageRepository {
   Future<String?> uploadProfileImageWeb(Uint8List fileBytes, String fileName) {
     return uploadBytes(fileBytes, fileName, "user_profile_images");
   }
-  // for cleaner code - implement following methods to 
+  // for cleaner code - implement following methods to
   // help upload files to storage ->
 
-  // mobile - file upload 
-  Future<String?> uploadFile(String path, String fileName, String folder) async {
+  // mobile - file upload
+  Future<String?> uploadFile(
+      String path, String fileName, String folder) async {
     try {
       // create file using the path
       final file = File(path);
@@ -43,7 +43,7 @@ class FirebaseStorageRepository implements StorageRepository {
 
       // Upload the file along with metadata.
       final uploadTask = await storageReference.putFile(file, metadata);
-      
+
       // finally upload the file
       // final uploadTask = await storageReference.putFile(file);
 
@@ -59,7 +59,8 @@ class FirebaseStorageRepository implements StorageRepository {
   }
 
   // web - byte upload
-  Future<String?> uploadBytes(Uint8List fileBytes, String fileName, String folder) async {
+  Future<String?> uploadBytes(
+      Uint8List fileBytes, String fileName, String folder) async {
     try {
       // now find the place to store the data
       final storageReference = storage.ref().child('$folder/$fileName');
@@ -93,19 +94,22 @@ class FirebaseStorageRepository implements StorageRepository {
   Future<String?> uploadPostImageMobile(String path, String fileName) {
     return uploadFile(path, fileName, "post_images");
   }
+
   // web - byte upload
   @override
   Future<String?> uploadPostImageWeb(Uint8List fileBytes, String fileName) {
     return uploadBytes(fileBytes, fileName, "post_images");
   }
 }
+
 // this method is used to get the content type of the file
-// this is used to set the content type of the file when uploading to firebase storage  
+// this is used to set the content type of the file when uploading to firebase storage
 String getContentType(String pathOrFileName) {
   final lowerCaseName = pathOrFileName.toLowerCase();
   if (lowerCaseName.endsWith('.png')) {
     return 'image/png';
-  } else if (lowerCaseName.endsWith('.jpg') || lowerCaseName.endsWith('.jpeg')) {
+  } else if (lowerCaseName.endsWith('.jpg') ||
+      lowerCaseName.endsWith('.jpeg')) {
     return 'image/jpeg';
   }
   // Optionally add other cases or a default:

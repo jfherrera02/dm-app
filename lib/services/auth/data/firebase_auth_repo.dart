@@ -1,4 +1,3 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dmessages/services/auth/domain/app_user.dart';
 import 'package:dmessages/services/auth/repo/auth_repo.dart';
@@ -13,11 +12,12 @@ class FirebaseAuthRepo implements AuthRepo {
 
   // begin with loging (will replace old loging method)
   @override
-  Future<AppUser?> newloginWithEmailPassword(String email, String password) async{
+  Future<AppUser?> newloginWithEmailPassword(
+      String email, String password) async {
     try {
       // sign in attempt
       UserCredential newuserCredential = await firebaseAuth
-      .signInWithEmailAndPassword(email: email, password: password);
+          .signInWithEmailAndPassword(email: email, password: password);
 
       // now we can fetch the user data from firebase
       // NOTE: we can also fetch the user data from firestore
@@ -26,66 +26,66 @@ class FirebaseAuthRepo implements AuthRepo {
       // get the current logged in user via firebase
 
       DocumentSnapshot userDoc = await firebaseFirestore
-      .collection("Users")
-      .doc(newuserCredential.user!.uid)
-      .get();
+          .collection("Users")
+          .doc(newuserCredential.user!.uid)
+          .get();
 
       // create the user
       AppUser user = AppUser(
-        uid: newuserCredential.user!.uid, 
-        email: email, 
+        uid: newuserCredential.user!.uid,
+        email: email,
         username: userDoc['username'],
         country: userDoc['country'], // default to empty string if not present
-        );    
+      );
       // finally, return the user
       return user;
-    }
-    catch (e) {
+    } catch (e) {
       throw Exception("Login Failed: $e");
     }
   }
 
   // register user
   // NOTE: can be changed later for future app updates
-  // such as adding 'current_country' 
+  // such as adding 'current_country'
   @override
-  Future<AppUser?> newregisterWithEmailPassword(String name, String email, String password, String country) async{
+  Future<AppUser?> newregisterWithEmailPassword(
+      String name, String email, String password, String country) async {
     try {
       // register attempt
       UserCredential newuserCredential = await firebaseAuth
-      .createUserWithEmailAndPassword(email: email, password: password);
+          .createUserWithEmailAndPassword(email: email, password: password);
 
       // create the user
       AppUser user = AppUser(
-        uid: newuserCredential.user!.uid, 
-        email: email, 
+        uid: newuserCredential.user!.uid,
+        email: email,
         username: name,
         country: country, // default to empty string if not present
-        );
-        print("country in firebase auth repo: $country");
-      
-      // also save user data in firestore 
+      );
+      print("country in firebase auth repo: $country");
+
+      // also save user data in firestore
       await firebaseFirestore
-      .collection("Users")
-      .doc(user.uid).set(user.toJson());
+          .collection("Users")
+          .doc(user.uid)
+          .set(user.toJson());
 
       // finally, return the user
       return user;
-    }
-    catch (e) {
+    } catch (e) {
       throw Exception("Login Failed: $e");
     }
   }
 
   // logout current user
-@override
-Future<void> newlogout() async {
-  try {
-    await firebaseAuth.signOut();
-  } catch (e) {
-    throw Exception("Logout failed: $e");
+  @override
+  Future<void> newlogout() async {
+    try {
+      await firebaseAuth.signOut();
+    } catch (e) {
+      throw Exception("Logout failed: $e");
+    }
   }
-}
 
   // fetch the current user
   @override
@@ -98,22 +98,23 @@ Future<void> newlogout() async {
       return null;
     }
     // get the user data from firestore again
-    DocumentSnapshot userDoc = await firebaseFirestore
-    .collection("Users").doc(firebaseUser.uid).get();
+    DocumentSnapshot userDoc =
+        await firebaseFirestore.collection("Users").doc(firebaseUser.uid).get();
 
     // check if the user exists in firestore
     if (!userDoc.exists) {
-      // if the user does not exist, we return null 
+      // if the user does not exist, we return null
       // NOTE: this should not happen, but we are just being safe
       return null;
     }
-      // user exists, so we fetch
-      return AppUser(
-        uid: firebaseUser.uid, 
-        email: firebaseUser.email!, 
-        username: userDoc['username'],
-        country: userDoc['country'] ?? '', // default to empty string if not present
-        // NOTE: we can also fetch the user data from firestore
-        );
+    // user exists, so we fetch
+    return AppUser(
+      uid: firebaseUser.uid,
+      email: firebaseUser.email!,
+      username: userDoc['username'],
+      country:
+          userDoc['country'] ?? '', // default to empty string if not present
+      // NOTE: we can also fetch the user data from firestore
+    );
   }
 }

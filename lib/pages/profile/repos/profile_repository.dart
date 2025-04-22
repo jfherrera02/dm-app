@@ -4,7 +4,7 @@ import 'package:dmessages/pages/profile/data/profile_user.dart';
 
 abstract class ProfileRepository {
   Future<ProfileUser?> fetchUserProfile(String uid);
-  
+
   // update the profile
-  Future<void> updateProfile (ProfileUser updateProfile);
+  Future<void> updateProfile(ProfileUser updateProfile);
 }

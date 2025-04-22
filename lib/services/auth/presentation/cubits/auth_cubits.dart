@@ -4,10 +4,10 @@ import 'package:dmessages/services/auth/presentation/auth_states.dart';
 import 'package:dmessages/services/auth/repo/auth_repo.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class AuthCubit extends Cubit<AuthStates>{
+class AuthCubit extends Cubit<AuthStates> {
   final AuthRepo authRepo;
   // keep track of the current user
-  AppUser? _newcurrentUser; 
+  AppUser? _newcurrentUser;
 
   AuthCubit({required this.authRepo}) : super(AuthInitial());
 
@@ -17,7 +17,7 @@ class AuthCubit extends Cubit<AuthStates>{
     final AppUser? user = await authRepo.newgetCurrentUser();
 
     // if it exists:
-    if(user != null) {
+    if (user != null) {
       _newcurrentUser = user;
       // IMPORTANT
       // we must 'emit' the state for this to work
@@ -34,10 +34,10 @@ class AuthCubit extends Cubit<AuthStates>{
   Future<void> loging(String email, String password) async {
     try {
       emit(AuthLoading());
-      final username = await authRepo.newloginWithEmailPassword(
-        email, password);
+      final username =
+          await authRepo.newloginWithEmailPassword(email, password);
 
-      // keep tracking if there is a user 
+      // keep tracking if there is a user
       if (username != null) {
         _newcurrentUser = username;
         emit(Authenticated(username));
@@ -46,18 +46,17 @@ class AuthCubit extends Cubit<AuthStates>{
       else {
         emit(UnAuthenticated());
       }
-      }
-      catch (e) {
-        // emit errors if any
-        emit(AuthError(e.toString()));
-        // which also means we are unauthenticated:
-        emit(UnAuthenticated());
+    } catch (e) {
+      // emit errors if any
+      emit(AuthError(e.toString()));
+      // which also means we are unauthenticated:
+      emit(UnAuthenticated());
     }
-    }
-  
+  }
 
   // register with the provided information
-  Future<void> newRegister(String userame, String email, String password, String country) async {
+  Future<void> newRegister(
+      String userame, String email, String password, String country) async {
     try {
       emit(AuthLoading());
       final user = await authRepo.newregisterWithEmailPassword(
@@ -65,7 +64,7 @@ class AuthCubit extends Cubit<AuthStates>{
         email, password,
         country, // default to USA for now
       );
-      // keep tracking if there is a user 
+      // keep tracking if there is a user
       if (user != null) {
         _newcurrentUser = user;
         emit(Authenticated(user));
@@ -74,18 +73,17 @@ class AuthCubit extends Cubit<AuthStates>{
       else {
         emit(UnAuthenticated());
       }
-      }
-      catch (e) {
-        // emit errors if any
-        emit(AuthError(e.toString()));
-        // which also means we are unauthenticated:
-        emit(UnAuthenticated());
+    } catch (e) {
+      // emit errors if any
+      emit(AuthError(e.toString()));
+      // which also means we are unauthenticated:
+      emit(UnAuthenticated());
     }
-    }
+  }
 
   // logout
   Future<void> newlogout() async {
     authRepo.newlogout();
-    emit(UnAuthenticated()); 
+    emit(UnAuthenticated());
   }
 }

@@ -1,11 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Message {
-
-  // what we need to know to send + receive messages 
+  // what we need to know to send + receive messages
   final String senderID;
   final String senderEmail;
-  final String receiverID; 
+  final String receiverID;
   final String message;
   final Timestamp timestamp;
 
@@ -15,7 +14,6 @@ class Message {
     required this.receiverID,
     required this.message,
     required this.timestamp,
-
   });
 
   // now convert it to a map
@@ -28,6 +26,4 @@ class Message {
       'timestamp': timestamp,
     };
   }
-
-
 }

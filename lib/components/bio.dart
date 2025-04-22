@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-// Bio widget that will show the text in a box 
+// Bio widget that will show the text in a box
 class Bio extends StatelessWidget {
   final String text;
 
@@ -14,11 +14,9 @@ class Bio extends StatelessWidget {
     // create the UI for the box
     return Container(
       padding: const EdgeInsets.all(20),
-
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.secondary,
       ),
-
       width: double.infinity,
       child: Text(text.isNotEmpty ? text : "This bio is empty! :("),
     );

@@ -33,7 +33,7 @@ class LoginPageState extends State<LoginPage> {
     final String email = emailController.text;
     final String password = passwordController.text;
 
-    // Get auth cubit for logging in 
+    // Get auth cubit for logging in
     final authCubit = context.read<AuthCubit>();
 
     // Now check that both fields are not empty
@@ -45,7 +45,8 @@ class LoginPageState extends State<LoginPage> {
     else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Please enter both email and password before logging in!"),
+          content:
+              Text("Please enter both email and password before logging in!"),
         ),
       );
     }
@@ -62,8 +63,12 @@ class LoginPageState extends State<LoginPage> {
           child: Column(
             children: [
               // Lock icon
-              Image(image: AssetImage('assets/images/tether-icon.png')),
-              const SizedBox(height: 45),
+              Image(image: AssetImage('assets/images/tether_text_black.png'),
+              width: 200,
+              height: 200,
+              fit: BoxFit.cover,
+                  ),
+              const SizedBox(height: 25),
 
               // Personalized message (Greeting)
               Text(
@@ -95,7 +100,7 @@ class LoginPageState extends State<LoginPage> {
 
               const SizedBox(height: 25),
 
-              // Make the login button 
+              // Make the login button
               MyButton(
                 text: "Login",
                 onTap: login,
@@ -109,11 +114,12 @@ class LoginPageState extends State<LoginPage> {
                 children: [
                   Text(
                     "New to Tether?",
-                    style: TextStyle(color: Theme.of(context).colorScheme.primary),
+                    style:
+                        TextStyle(color: Theme.of(context).colorScheme.primary),
                   ),
                   const SizedBox(width: 5),
                   GestureDetector(
-                    // Make onTap into a widget so it can 
+                    // Make onTap into a widget so it can
                     // also be used in the register page / etc..
                     // onTap will serve as a toggle page
                     onTap: widget.onTap,

@@ -6,7 +6,8 @@ class MyTextField extends StatefulWidget {
   final bool obscureText; // Determines if text should be hidden (for passwords)
   final TextEditingController controller; // Controls text input
   final FocusNode? focusNode; // Optional: Manages focus behavior
-  final TextInputType keyboardType; // Determines the keyboard type (e.g., email, text, password)
+  final TextInputType
+      keyboardType; // Determines the keyboard type (e.g., email, text, password)
 
   const MyTextField({
     super.key,
@@ -34,32 +35,47 @@ class _MyTextFieldState extends State<MyTextField> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 25.0), // Adds padding around the text field
+      padding: const EdgeInsets.symmetric(
+          horizontal: 25.0), // Adds padding around the text field
       child: TextField(
         controller: widget.controller,
         focusNode: widget.focusNode,
-        obscureText: widget.obscureText ? _isObscured : false, // Only obscure if the flag is true
-        keyboardType: widget.keyboardType, // Set the keyboard type based on input
+        obscureText: widget.obscureText
+            ? _isObscured
+            : false, // Only obscure if the flag is true
+        keyboardType:
+            widget.keyboardType, // Set the keyboard type based on input
         decoration: InputDecoration(
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(
-                color: Theme.of(context).colorScheme.tertiary), // Border color when not focused
+                color: Theme.of(context)
+                    .colorScheme
+                    .tertiary), // Border color when not focused
           ),
           focusedBorder: OutlineInputBorder(
             borderSide: BorderSide(
-                color: Theme.of(context).colorScheme.tertiary), // Border color when focused
+                color: Theme.of(context)
+                    .colorScheme
+                    .tertiary), // Border color when focused
           ),
-          fillColor: Theme.of(context).colorScheme.secondary, // Background color of the input field
+          fillColor: Theme.of(context)
+              .colorScheme
+              .secondary, // Background color of the input field
           filled: true, // Ensures the background is filled
           hintText: widget.hintText, // Placeholder text
-          hintStyle: TextStyle(color: Theme.of(context).colorScheme.primary), // Hint text color
-          
+          hintStyle: TextStyle(
+              color: Theme.of(context).colorScheme.primary), // Hint text color
+
           // Password visibility toggle (only shown for password fields)
           suffixIcon: widget.obscureText
               ? IconButton(
                   icon: Icon(
-                    _isObscured ? Icons.visibility_off : Icons.visibility, // Change icon based on state
-                    color: Theme.of(context).colorScheme.primary, // Matches theme color
+                    _isObscured
+                        ? Icons.visibility_off
+                        : Icons.visibility, // Change icon based on state
+                    color: Theme.of(context)
+                        .colorScheme
+                        .primary, // Matches theme color
                   ),
                   onPressed: () {
                     setState(() {

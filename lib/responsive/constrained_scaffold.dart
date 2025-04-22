@@ -27,10 +27,9 @@ class ConstrainedScaffold extends StatelessWidget {
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 430),
-            child: body,
+          child: body,
         ),
       ),
     );
   }
-
 }

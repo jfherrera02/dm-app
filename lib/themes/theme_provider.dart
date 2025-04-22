@@ -20,7 +20,7 @@ class ThemeProvider extends ChangeNotifier {
     if (_themeData == lightMode) {
       themeData = darkMode;
     } else {
-      themeData = lightMode; 
+      themeData = lightMode;
     }
   }
 }

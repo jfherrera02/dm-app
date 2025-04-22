@@ -14,7 +14,8 @@ class NewsPage extends StatefulWidget {
   State<NewsPage> createState() => NewsPageState();
 }
 
-class NewsPageState extends State<NewsPage> with SingleTickerProviderStateMixin {
+class NewsPageState extends State<NewsPage>
+    with SingleTickerProviderStateMixin {
   // fetch news
   final Dio _dio = Dio();
   // create a list of news articles
@@ -114,7 +115,8 @@ class NewsPageState extends State<NewsPage> with SingleTickerProviderStateMixin 
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(15)),
               child: Image.network(
                 article.urlToImage ?? '',
                 height: 200,
@@ -137,7 +139,8 @@ class NewsPageState extends State<NewsPage> with SingleTickerProviderStateMixin 
                 children: [
                   Text(
                     article.title ?? 'No Title',
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 6),
                   Text(
@@ -152,7 +155,8 @@ class NewsPageState extends State<NewsPage> with SingleTickerProviderStateMixin 
                     children: [
                       Text(
                         article.source?.name ?? 'Unknown Source',
-                        style: const TextStyle(fontStyle: FontStyle.italic, color: Colors.grey),
+                        style: const TextStyle(
+                            fontStyle: FontStyle.italic, color: Colors.grey),
                       ),
                       Text(
                         article.publishedAt != null
@@ -189,17 +193,30 @@ class NewsPageState extends State<NewsPage> with SingleTickerProviderStateMixin 
               await getFilterNews();
             },
             itemBuilder: (context) => [
-              const PopupMenuItem<String>(value: 'category:business', child: Text('Category: Business')),
-              const PopupMenuItem<String>(value: 'category:entertainment', child: Text('Category: Entertainment')),
-              const PopupMenuItem<String>(value: 'category:general', child: Text('Category: General')),
-              const PopupMenuItem<String>(value: 'category:health', child: Text('Category: Health')),
-              const PopupMenuItem<String>(value: 'category:science', child: Text('Category: Science')),
-              const PopupMenuItem<String>(value: 'category:sports', child: Text('Category: Sports')),
-              const PopupMenuItem<String>(value: 'category:technology', child: Text('Category: Technology')),
+              const PopupMenuItem<String>(
+                  value: 'category:business',
+                  child: Text('Category: Business')),
+              const PopupMenuItem<String>(
+                  value: 'category:entertainment',
+                  child: Text('Category: Entertainment')),
+              const PopupMenuItem<String>(
+                  value: 'category:general', child: Text('Category: General')),
+              const PopupMenuItem<String>(
+                  value: 'category:health', child: Text('Category: Health')),
+              const PopupMenuItem<String>(
+                  value: 'category:science', child: Text('Category: Science')),
+              const PopupMenuItem<String>(
+                  value: 'category:sports', child: Text('Category: Sports')),
+              const PopupMenuItem<String>(
+                  value: 'category:technology',
+                  child: Text('Category: Technology')),
               const PopupMenuDivider(),
-              const PopupMenuItem<String>(value: 'country:us', child: Text('Country: United States')),
-              const PopupMenuItem<String>(value: 'country:kr', child: Text('Country: South Korea')),
-              const PopupMenuItem<String>(value: 'country:br', child: Text('Country: Brazil')),
+              const PopupMenuItem<String>(
+                  value: 'country:us', child: Text('Country: United States')),
+              const PopupMenuItem<String>(
+                  value: 'country:kr', child: Text('Country: South Korea')),
+              const PopupMenuItem<String>(
+                  value: 'country:br', child: Text('Country: Brazil')),
             ],
           ),
         ),
@@ -214,18 +231,21 @@ class NewsPageState extends State<NewsPage> with SingleTickerProviderStateMixin 
       itemCount: sources.length,
       itemBuilder: (context, index) {
         final source = sources[index];
-        final logoUrl = 'https://logo.clearbit.com/${Uri.parse(source.url).host}?size=256';
+        final logoUrl =
+            'https://logo.clearbit.com/${Uri.parse(source.url).host}?size=256';
         return GestureDetector(
           onTap: () => launchURL(source.url),
           child: Card(
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
             elevation: 4,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(15)),
                   child: Image.network(
                     logoUrl,
                     height: 200,
@@ -235,7 +255,8 @@ class NewsPageState extends State<NewsPage> with SingleTickerProviderStateMixin 
                       return SizedBox(
                         height: 200,
                         child: Center(
-                          child: Icon(Icons.public, size: 60, color: Colors.grey[400]),
+                          child: Icon(Icons.public,
+                              size: 60, color: Colors.grey[400]),
                         ),
                       );
                     },
@@ -248,7 +269,8 @@ class NewsPageState extends State<NewsPage> with SingleTickerProviderStateMixin 
                     children: [
                       Text(
                         source.name,
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 6),
                       Text(
@@ -263,7 +285,9 @@ class NewsPageState extends State<NewsPage> with SingleTickerProviderStateMixin 
                         children: [
                           Text(
                             source.category.toUpperCase(),
-                            style: const TextStyle(fontStyle: FontStyle.italic, color: Colors.grey),
+                            style: const TextStyle(
+                                fontStyle: FontStyle.italic,
+                                color: Colors.grey),
                           ),
                           Text(
                             source.country.toUpperCase(),
@@ -285,17 +309,15 @@ class NewsPageState extends State<NewsPage> with SingleTickerProviderStateMixin 
   Future<void> _getNews() async {
     // This function will be used to fetch news articles
     final response = await _dio.get(
-      '${dotenv.env['NEWSHEADLINES']}?country=us&apiKey=${dotenv.env['NEWSKEY']}')
-;    final articlesJson = response.data['articles'] as List;
+        '${dotenv.env['NEWSHEADLINES']}?country=us&apiKey=${dotenv.env['NEWSKEY']}');
+    final articlesJson = response.data['articles'] as List;
     setState(() {
-      List<NewsArticle> newsArticles = articlesJson
-          .map((article) => NewsArticle.fromJson(article))
-          .toList();
+      List<NewsArticle> newsArticles =
+          articlesJson.map((article) => NewsArticle.fromJson(article)).toList();
       // Filter out articles with null image URLs
       // This is to ensure that we only display articles with images
-      newsArticles = newsArticles
-          .where((article) => article.urlToImage != null)
-          .toList();
+      newsArticles =
+          newsArticles.where((article) => article.urlToImage != null).toList();
       articles = newsArticles;
     });
   }
@@ -307,8 +329,7 @@ class NewsPageState extends State<NewsPage> with SingleTickerProviderStateMixin 
     List<NewsArticle> aggregated = [];
     for (var code in friendCountries) {
       final resp = await _dio.get(
-        '${dotenv.env['NEWSEVERY']}?q=$code&apiKey=${dotenv.env['NEWSKEY']}'
-      );
+          '${dotenv.env['NEWSEVERY']}?q=$code&apiKey=${dotenv.env['NEWSKEY']}');
 
       final list = resp.data['articles'] as List;
       aggregated.addAll(list.map((j) => NewsArticle.fromJson(j)));
@@ -325,14 +346,12 @@ class NewsPageState extends State<NewsPage> with SingleTickerProviderStateMixin 
     print('Selected Country: $selectedCountry');
     print('NEWS SOURCES: ${dotenv.env['NEWSSOURCE']}');
     final response = await _dio.get(
-      '${dotenv.env['NEWSSOURCE']}?category=$selectedCategory&country=$selectedCountry&apiKey=${dotenv.env['NEWSKEY']}');
+        '${dotenv.env['NEWSSOURCE']}?category=$selectedCategory&country=$selectedCountry&apiKey=${dotenv.env['NEWSKEY']}');
     // print the response
     print('Response: ${response.data}');
     final sourcesJson = response.data['sources'] as List;
     setState(() {
-      sources = sourcesJson
-          .map((s) => NewsSource.fromJson(s))
-          .toList();
+      sources = sourcesJson.map((s) => NewsSource.fromJson(s)).toList();
     });
   }
 

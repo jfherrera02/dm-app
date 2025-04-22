@@ -19,7 +19,8 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
   }
 
   void _loadFriendRequests() async {
-    List<Map<String, dynamic>> requests = await _authService.getFriendRequests();
+    List<Map<String, dynamic>> requests =
+        await _authService.getFriendRequests();
     setState(() {
       _friendRequests = requests;
     });
@@ -56,7 +57,8 @@ class _FriendRequestsPageState extends State<FriendRequestsPage> {
                   leading: CircleAvatar(
                     backgroundImage: request['profileImageUrl'].isNotEmpty
                         ? NetworkImage(request['profileImageUrl'])
-                        : AssetImage('assets/images/default_avatar.png') as ImageProvider,
+                        : AssetImage('assets/images/default_avatar.png')
+                            as ImageProvider,
                   ),
                   title: Text(request['username']),
                   subtitle: Text(request['email']),

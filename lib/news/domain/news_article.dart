@@ -13,48 +13,47 @@ class NewsArticle {
   String? content;
   // String? id; // Add this line to include the id field
 
-  
-    NewsArticle({
-      this.source,
-      this.author,
-      this.title,
-      this.description,
-      this.url,
-      this.urlToImage,
-      this.publishedAt,
-      this.content,
-      // this.id, // Add this line to include the id field
-    });
+  NewsArticle({
+    this.source,
+    this.author,
+    this.title,
+    this.description,
+    this.url,
+    this.urlToImage,
+    this.publishedAt,
+    this.content,
+    // this.id, // Add this line to include the id field
+  });
 
-    // Convert news article object 
-    Map<String, dynamic> toJson() {
-      final Map<String, dynamic> data = <String, dynamic>{};
-      if (source != null) {
-        data['source'] = source!.toJson();
-      }
-      data['author'] = author;
-      data['title'] = title;
-      data['description'] = description;
-      data['url'] = url;
-      data['urlToImage'] = urlToImage;
-      data['publishedAt'] = publishedAt;
-      data['content'] = content;
-      // data['id'] = id; // Add this line to include the id field
-      return data;
+  // Convert news article object
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (source != null) {
+      data['source'] = source!.toJson();
     }
+    data['author'] = author;
+    data['title'] = title;
+    data['description'] = description;
+    data['url'] = url;
+    data['urlToImage'] = urlToImage;
+    data['publishedAt'] = publishedAt;
+    data['content'] = content;
+    // data['id'] = id; // Add this line to include the id field
+    return data;
+  }
 
-    // REVERSE: from firebase, return json file ----> news article object to use
-    NewsArticle.fromJson(Map<String, dynamic> json) {
-      source = json['source'] != null ? Source.fromJson(json['source']) : null;
-      author = json['author'];
-      title = json['title'];
-      description = json['description'];
-      url = json['url'];
-      urlToImage = json['urlToImage'];
-      publishedAt = DateTime.parse(json['publishedAt'] as String);
-      content = json['content'];
-      // id = json['id']; // Add this line to include the id field
-    } 
+  // REVERSE: from firebase, return json file ----> news article object to use
+  NewsArticle.fromJson(Map<String, dynamic> json) {
+    source = json['source'] != null ? Source.fromJson(json['source']) : null;
+    author = json['author'];
+    title = json['title'];
+    description = json['description'];
+    url = json['url'];
+    urlToImage = json['urlToImage'];
+    publishedAt = DateTime.parse(json['publishedAt'] as String);
+    content = json['content'];
+    // id = json['id']; // Add this line to include the id field
+  }
 }
 
 class Source {
