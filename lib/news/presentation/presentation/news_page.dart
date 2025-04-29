@@ -57,13 +57,13 @@ class NewsPageState extends State<NewsPage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Global News'),
+        title: const Text('News'),
         bottom: TabBar(
           controller: _tabController,
           tabs: const [
             Tab(text: 'Home'),
             Tab(text: 'All Countries'),
-            Tab(text: 'Filter'),
+            Tab(text: 'Sources'),
           ],
         ),
       ),
@@ -123,11 +123,11 @@ class NewsPageState extends State<NewsPage>
                 width: double.infinity,
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
-                  return Image.asset(
-                    'assets/images/placeholder.png',
+                  return Image.network(
+                    'https://logo.clearbit.com/${Uri.parse(article.url ?? 'assets/images/placeholder.png').host}?size=256',
                     height: 200,
                     width: double.infinity,
-                    fit: BoxFit.cover,
+                    fit: BoxFit.contain,
                   );
                 },
               ),
@@ -214,7 +214,7 @@ class NewsPageState extends State<NewsPage>
               const PopupMenuItem<String>(
                   value: 'country:us', child: Text('Country: United States')),
               const PopupMenuItem<String>(
-                  value: 'country:kr', child: Text('Country: South Korea')),
+                  value: 'country:jp', child: Text('Country: Japan')),
               const PopupMenuItem<String>(
                   value: 'country:br', child: Text('Country: Brazil')),
             ],
@@ -325,7 +325,7 @@ class NewsPageState extends State<NewsPage>
   Future<void> getAllCountriesNews() async {
     // This function fetches news for all friend countries
     // TODO: replace placeholder with actual friend countries list
-    final List<String> friendCountries = ['China', 'Korea', 'Mexico'];
+    final List<String> friendCountries = ['Korea', 'Mexico', 'Japan'];
     List<NewsArticle> aggregated = [];
     for (var code in friendCountries) {
       final resp = await _dio.get(

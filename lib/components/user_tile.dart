@@ -14,6 +14,8 @@ class UserTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // get the auth cubit
+    
     return GestureDetector(
         onTap: onTap,
         child: Container(

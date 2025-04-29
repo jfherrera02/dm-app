@@ -53,6 +53,8 @@ dependencies:
   flutter_dotenv: ^5.2.1
   # Display time since a post was created/ other time related functions
   timeago: ^3.2.2
+  # Calendar
+  table_calendar: ^3.2.0
   
 dev_dependencies:
   flutter_test:

@@ -146,7 +146,7 @@ class _FriendPageState extends State<FriendPage> {
     }
 
     return UserTile(
-      text: userData["email"],
+      text: userData["username"],
       onTap: () {
         // Navigate to the chat page when tapping a user
         Navigator.push(

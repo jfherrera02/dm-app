@@ -1,4 +1,3 @@
-import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dmessages/components/bio.dart';
@@ -70,6 +69,13 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                       child: Row(
                         children: [
+                          // back button
+                          // only show back button if not own profile
+                          if (user.uid != currentUser?.uid)
+                            IconButton(
+                              icon: const Icon(Icons.arrow_back),
+                              onPressed: () => Navigator.pop(context),
+                            ),
                           // user's country flag or default icon
                           userCountryParse.isNotEmpty
                               ? Text(userCountryParse, style: const TextStyle(fontSize: 18))

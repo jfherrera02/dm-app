@@ -1,7 +1,7 @@
+import 'package:dmessages/calendar/presentation/personal_calendar.dart';
 import 'package:dmessages/components/my_drawer.dart';
 import 'package:dmessages/news/presentation/presentation/news_page.dart';
 import 'package:dmessages/post/post_components/post_tile.dart';
-import 'package:dmessages/pages/calendar_page.dart';
 import 'package:dmessages/pages/friends_page.dart';
 import 'package:dmessages/pages/profile/presentation/cubit/profile_page.dart';
 import 'package:dmessages/post/presentation/cubits/post_cubit.dart';
@@ -65,7 +65,8 @@ class _ActualHomeState extends State<ActualHome> {
       const HomeFeed(), // Replaces placeholder text with HomeFeed
       NewsPage(uid: uid),
       FriendPage(),
-      CalendarPage(),
+      //CalendarPage(),
+      const PersonalCalendarPage(), // Placeholder for the personal calendar page
       // requires uid to view profiles
       // so before that we must get the
       // current user's id -->
@@ -74,7 +75,7 @@ class _ActualHomeState extends State<ActualHome> {
 
     return ConstrainedScaffold(
       // backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: _selectedIndex == 4
+      appBar: _selectedIndex == 4 || _selectedIndex == 3
           ? null
           : // Hide AppBar on Profile Page
           AppBar(

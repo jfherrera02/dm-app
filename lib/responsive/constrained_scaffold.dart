@@ -9,13 +9,17 @@ class ConstrainedScaffold extends StatelessWidget {
   final Widget? bottomNavigationBar;
   final Widget? drawer;
   final Widget? body;
+  
+  final dynamic floatingActionButton;
 
   const ConstrainedScaffold({
     super.key,
     required this.body,
     this.appBar,
     this.bottomNavigationBar,
-    this.drawer,
+    this.drawer, 
+    //optional floating action button
+    this.floatingActionButton,
   });
 
   @override
