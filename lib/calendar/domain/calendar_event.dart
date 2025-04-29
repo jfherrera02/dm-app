@@ -1,27 +1,38 @@
-/*
-class Event {
-  final String id;
-  final String title;
-  final String description;
-  final DateTime startTime;
-  final DateTime endTime;
 
-  Event({
+// A single calendar event
+class CalendarEvent {
+  /// Firestore document ID
+  final String id;
+
+  // The date of the event
+  final DateTime date;
+
+  // A short title or description
+  final String title;
+
+  CalendarEvent({
     required this.id,
+    required this.date,
     required this.title,
-    required this.description,
-    required this.startTime,
-    required this.endTime,
   });
 
-  @override
-  String toString() {
-    return 'CalendarEvent{id: $id, title: $title, description: $description, startTime: $startTime, endTime: $endTime}';
+  // Convert to a Map to use .set() or .update() in Firestore
+  Map<String, dynamic> toJson() {
+    return {
+      'date': date.toIso8601String(),
+      'title': title,
+    };
   }
-}
-*/ 
 
-class Event {
-  final String title;
-  Event(this.title);
+  // Create from Firestore document data, using the doc ID as `id`.
+  factory CalendarEvent.fromJson(String id, Map<String, dynamic> json) {
+    return CalendarEvent(
+      id: id,
+      date: DateTime.parse(json['date'] as String),
+      title: json['title'] as String,
+    );
+  }
+
+  @override
+  String toString() => title;
 }

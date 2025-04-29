@@ -1,3 +1,5 @@
+import 'package:dmessages/calendar/data/calendar_repository.dart';
+import 'package:dmessages/calendar/domain/calendar_cubit.dart';
 import 'package:dmessages/features/data/firebase_storage_repository.dart';
 import 'package:dmessages/post/presentation/pages/actual_home.dart';
 import 'package:dmessages/pages/profile/data/firebase_profile_repo.dart';
@@ -31,6 +33,7 @@ void main() async {
     ),
   );
 }
+
 //
 class MyApp extends StatelessWidget {
   // auth repository
@@ -44,6 +47,10 @@ class MyApp extends StatelessWidget {
 
   // create firebase repo for Profile provider
   final profileRepository = FirebaseProfileRepo();
+
+  // get the new calendar repository
+  final calendarRepository = CalendarRepository();
+
   MyApp({super.key});
 
   @override
@@ -56,6 +63,7 @@ class MyApp extends StatelessWidget {
         BlocProvider<AuthCubit>(
           create: (context) => AuthCubit(authRepo: authRepo)..checkAuth(),
         ),
+
         // profile cubit provider
         BlocProvider<ProfileCubit>(
           // requires a firebase repo
@@ -71,6 +79,7 @@ class MyApp extends StatelessWidget {
             storageRepo: storageRepository,
           ),
         ),
+        // calendar cubit provider
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -84,7 +93,13 @@ class MyApp extends StatelessWidget {
 
             // authenticated -> go to the home page
             if (authStates is Authenticated) {
-              return const ActualHome();
+              return BlocProvider<CalendarCubit>(
+                create: (context) => CalendarCubit(
+                  calendarId: authStates.user.uid,
+                  repository: calendarRepository,
+                ),
+                child: const ActualHome(),
+              );
             }
 
             // loading...

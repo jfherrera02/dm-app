@@ -1,7 +1,9 @@
-// Placeholder for the personal calendar page
+import 'package:dmessages/calendar/domain/calendar_cubit.dart';
+import 'package:dmessages/calendar/domain/calendar_state.dart';
 import 'package:dmessages/calendar/domain/calendar_event.dart';
-import 'package:dmessages/calendar/presentation/friends_calendar.dart';
+import 'package:dmessages/calendar/presentation/friends_list.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class PersonalCalendarPage extends StatefulWidget {
@@ -14,164 +16,157 @@ class PersonalCalendarPage extends StatefulWidget {
 class PersonalCalendarPageState extends State<PersonalCalendarPage> {
   // Format for the calendar
   CalendarFormat calendarFormat = CalendarFormat.month;
-  // This is the selected day in the calendar
-  DateTime? _selectedDay;
-  DateTime _focusedDay = DateTime.now();
 
-  // State Notifier for the calendar
-  late final ValueNotifier<List<Event>> selectedEvents;
   // Controllers for user input
-  TextEditingController eventController = TextEditingController();
-
-  // Map to hold events for each day
-  Map<DateTime, List<Event>> events = {};
-
-  @override
-  void initState() {
-    super.initState();
-    _selectedDay = _focusedDay;
-    selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));    
-  }
+  final TextEditingController eventController = TextEditingController();
 
   @override
   void dispose() {
     eventController.dispose();
-    selectedEvents.dispose();
     super.dispose();
   }
 
-  void onDaySelected(DateTime selectedDay, DateTime focusedDay) {
-    // Update the selected day and focused day
-    setState(() {
-      _selectedDay = selectedDay;
-      _focusedDay = focusedDay;
-    });
-    // Update the events for the selected day
-    selectedEvents.value = _getEventsForDay(selectedDay);
-  }
-
-  // Function to get events for a specific day
-  List<Event> _getEventsForDay(DateTime day) {
-    final key = DateTime(day.year, day.month, day.day);
-    return events[key] ?? [];
-  }
-  
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Calendar'),
-          bottom: TabBar(
-            tabs: [
-              Tab(text: 'Personal'),
-              Tab(text: 'Shared'),
-            ],
-          ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            // Handle the action for adding a new event
-            showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  scrollable: true,
-                  title: const Text('Add Event'),
-                  content: TextField(
-                    controller: eventController,
-                    decoration: const InputDecoration(hintText: 'Event Title'),
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        // Add the event to the selected day
-                        if (_selectedDay != null && eventController.text.isNotEmpty) {
-                          final key = DateTime(_selectedDay!.year, _selectedDay!.month, _selectedDay!.day);
-                          setState(() {
-                            events[key] = [
-                              ..._getEventsForDay(_selectedDay!),
-                              Event(eventController.text),
-                            ];
-                            selectedEvents.value = _getEventsForDay(_selectedDay!);
-                          });
-                        }
-                        Navigator.of(context).pop();
-                        eventController.clear();
-                      },
-                      child: const Text('Save'),
-                    ),
-                  ],
+    return BlocBuilder<CalendarCubit, CalendarState>(
+      builder: (context, state) {
+        // the currently selected day from cubit
+        final selectedDay = state.selectedDate;
+        final eventsForDay = state.eventsByDay[selectedDay] ?? [];
+
+        return DefaultTabController(
+          length: 2,
+          child: Scaffold(
+            appBar: AppBar(
+              title: const Text('Calendar'),
+              bottom: TabBar(
+                tabs: [
+                  Tab(text: 'Personal'),
+                  Tab(text: 'Shared'),
+                ],
+              ),
+            ),
+            floatingActionButton: FloatingActionButton(
+              onPressed: () {
+                final parentContext = context;
+                showDialog(
+                  context: parentContext,
+                  builder: (dialogContext) {
+                    return AlertDialog(
+                      scrollable: true,
+                      title: const Text('Add Event'),
+                      content: TextField(
+                        controller: eventController,
+                        decoration: const InputDecoration(
+                          hintText: 'Enter event title',
+                          hintStyle: TextStyle(color: Colors.grey),
+                        ),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(dialogContext).pop();
+                            eventController.clear();
+                          },
+                          child: const Text('Cancel'),
+                        ),
+                        // Save button to add the event
+                        TextButton(
+                          onPressed: () {
+                            final title = eventController.text.trim();
+                            if (title.isNotEmpty) {
+                              parentContext
+                                  .read<CalendarCubit>()
+                                  .addEvent(title);
+                            }
+                            Navigator.of(dialogContext).pop();
+                            eventController.clear();
+                          },
+                          child: const Text('Save'),
+                        ),
+                      ],
+                    );
+                  },
                 );
               },
-            );
-          },
-          child: const Icon(Icons.add),
-        ),
-        body: TabBarView(
-          children: [
-            Column(
+              child: const Icon(Icons.add),
+            ),
+            body: TabBarView(
               children: [
-                TableCalendar<Event>(
-                  firstDay: DateTime.utc(2020, 1, 1),
-                  lastDay: DateTime.utc(2030, 12, 31),
-                  focusedDay: _focusedDay,
-                  selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-                  onDaySelected: onDaySelected,
-                  calendarFormat: calendarFormat,
-                  onFormatChanged: (format) {
-                    setState(() => calendarFormat = format);
-                  },
-                  onPageChanged: (focused) => _focusedDay = focused,
-                  eventLoader: _getEventsForDay,
-                  availableCalendarFormats: const {
-                    CalendarFormat.month: 'Month',
-                    CalendarFormat.twoWeeks: '2 Weeks',
-                    CalendarFormat.week: 'Week',
-                  },
-                  headerStyle: const HeaderStyle(
-                    titleCentered: true,
-                    formatButtonVisible: true,
-                    formatButtonShowsNext: false,
-                  ),
-                  calendarBuilders: CalendarBuilders(
-                    markerBuilder: (context, date, events) {
-                      if (events.isEmpty) return const SizedBox();
-                      return Positioned(
-                        bottom: 4,
-                        child: Column(
-                          children: events.map((e) {
-                            return Container(
-                              width: 20,
-                              height: 4,
-                              margin: const EdgeInsets.symmetric(vertical: 1),
-                              decoration: BoxDecoration(
-                                color: Colors.blueAccent,
-                                borderRadius: BorderRadius.circular(2),
+                Column(
+                  children: [
+                    TableCalendar<CalendarEvent>(
+                      firstDay: DateTime.utc(2020, 1, 1),
+                      lastDay: DateTime.utc(2030, 12, 31),
+                      focusedDay: state.selectedDate,
+                      selectedDayPredicate: (day) =>
+                          isSameDay(day, state.selectedDate),
+                      onDaySelected: (selected, focused) {
+                        // tell cubit we selected a new date
+                        context
+                            .read<CalendarCubit>()
+                            .selectDate(selected);
+                      },
+                      calendarFormat: calendarFormat,
+                      onFormatChanged: (format) {
+                        setState(() => calendarFormat = format);
+                      },
+                      onPageChanged: (focused) {
+                        // no-op or update the focused day
+                      },
+                      eventLoader: (day) {
+                        final key =
+                            DateTime(day.year, day.month, day.day);
+                        return state.eventsByDay[key] ?? [];
+                      },
+                      availableCalendarFormats: const {
+                        CalendarFormat.month: 'Month',
+                        CalendarFormat.twoWeeks: '2 Weeks',
+                        CalendarFormat.week: 'Week',
+                      },
+                      headerStyle: const HeaderStyle(
+                        titleCentered: true,
+                        formatButtonVisible: true,
+                        formatButtonShowsNext: false,
+                      ),
+                      calendarBuilders: CalendarBuilders(
+                        markerBuilder: (context, date, events) {
+                          if (events.isEmpty) return const SizedBox();
+                          // stacked bars per event
+                          return Positioned(
+                            bottom: 4,
+                            child: Column(
+                              children: List.generate(
+                                events.length,
+                                (_) => Container(
+                                  width: 20,
+                                  height: 4,
+                                  margin: const EdgeInsets.symmetric(
+                                      vertical: 1),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blueAccent,
+                                    borderRadius:
+                                        BorderRadius.circular(2),
+                                  ),
+                                ),
                               ),
-                            );
-                          }).toList(),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(height: 8.0),
-                Text(
-                  // convert the selected day to a string format
-                  _selectedDay != null
-                      ? 'Events for ${_selectedDay!.day}/${_selectedDay!.month}/${_selectedDay!.year}'
-                      : 'Select a day',
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                Expanded(
-                  child: ValueListenableBuilder<List<Event>>(
-                    valueListenable: selectedEvents,
-                    builder: (context, value, _) {
-                      return ListView.builder(
-                        itemCount: value.length,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 16.0),
+                    Text(
+                      // show which day we’re looking at
+                      'Events for ${selectedDay.day}/${selectedDay.month}/${selectedDay.year}',
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: eventsForDay.length,
                         itemBuilder: (context, index) {
+                          final ev = eventsForDay[index];
                           return Container(
                             margin: const EdgeInsets.all(8.0),
                             padding: const EdgeInsets.all(16.0),
@@ -180,32 +175,31 @@ class PersonalCalendarPageState extends State<PersonalCalendarPage> {
                               borderRadius: BorderRadius.circular(8.0),
                             ),
                             child: ListTile(
-                              onTap: () => print('Event tapped: ${value[index]}'),
-                              title: Text(value[index].title),
+                              onTap: () =>
+                                  print('Event tapped: ${ev.title}'),
+                              title: Text(ev.title),
                               trailing: IconButton(
                                 icon: const Icon(Icons.delete),
                                 onPressed: () {
-                                  // Handle delete event action
-                                  setState(() {
-                                    final key = DateTime(_selectedDay!.year, _selectedDay!.month, _selectedDay!.day);
-                                    events[key]!.removeAt(index);
-                                    selectedEvents.value = _getEventsForDay(_selectedDay!);
-                                  });
+                                  // delete via cubit
+                                  context
+                                      .read<CalendarCubit>()
+                                      .deleteEvent(ev.id);
                                 },
                               ),
                             ),
                           );
                         },
-                      );
-                    },
-                  ),
+                      ),
+                    ),
+                  ],
                 ),
+                FriendsList(context),
               ],
             ),
-            buildFriendsCalendar(context),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }
