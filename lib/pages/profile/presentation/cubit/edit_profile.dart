@@ -96,7 +96,7 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   Widget buildEditPage() {
-    return ConstrainedScaffold(
+    return Scaffold(
       appBar: AppBar(
         title: const Text("Edit Profile"),
         foregroundColor: Theme.of(context).colorScheme.primary,

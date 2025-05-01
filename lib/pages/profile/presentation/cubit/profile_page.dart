@@ -57,7 +57,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             CachedNetworkImage.evictFromCache(user.profileImageUrl);
           });
 
-          return ConstrainedScaffold(
+          return Scaffold(
             // no AppBar, custom header below
             body: SingleChildScrollView(
               child: Column(

@@ -1,11 +1,18 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dmessages/models/message.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class ChatService {
   // Get the instance of Firestore + auth
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  // Get the instance of Firebase Storage
+  // for sending images
+  final FirebaseStorage _storage = FirebaseStorage.instance;
 
   // obtain user  stream
   /*
@@ -41,7 +48,7 @@ class ChatService {
   }
 
   // send() messages
-  Future<void> sendMessage(String receiverID, message) async {
+  Future<void> sendMessage(String receiverID, {required String message, String? imageURL}) async {
     // get current user info
     final String currentUserID = _auth.currentUser!.uid;
     final String currentUserEmail = _auth.currentUser!.email!;
@@ -54,7 +61,9 @@ class ChatService {
         senderEmail: currentUserEmail,
         receiverID: receiverID,
         message: message,
-        timestamp: timestamp);
+        timestamp: timestamp,
+        imageURL: imageURL,
+        );
 
     // cosntruct the chat room ID for the 2 users (unique)
     // group chats to be later implemented
@@ -71,6 +80,25 @@ class ChatService {
     // add new message to the database (ensure they are not deleted every time)
   }
 
+  // pick & upload an image, then send as a message
+  Future<void> sendImage(String receiverID, File file) async {
+    final String currentUserID = _auth.currentUser!.uid;
+    List<String> ids = [currentUserID, receiverID]..sort();
+    String chatRoomID = ids.join('_');
+
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    final fileName = '$timestamp${file.path.split('/').last}';
+    final ref = _storage.ref().child('chat_images/$chatRoomID/$fileName');
+    final uploadTask = await ref.putFile(file);
+    final downloadUrl = await uploadTask.ref.getDownloadURL();
+
+    await sendMessage(
+      receiverID,
+      message: '',
+      imageURL: downloadUrl,
+    );
+  }
+
   // receive() messages
   Stream<QuerySnapshot> getMessages(String userID, otherUserID) {
     List<String> ids = [userID, otherUserID];
@@ -80,7 +108,7 @@ class ChatService {
     return _firestore
         .collection("chat_rooms")
         .doc(chatRoomID)
-        .collection("messages")
+        .collection("messages") // and get the images
         .orderBy("timestamp", descending: false)
         .snapshots();
   }

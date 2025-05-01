@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dmessages/components/chat_bubble.dart';
 import 'package:dmessages/components/my_textfield.dart';
 import 'package:dmessages/services/auth/auth_service.dart';
 import 'package:dmessages/services/chat/chat_services.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ChatPage extends StatefulWidget {
   // user requirements
@@ -77,13 +80,42 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
+  // send an image
+  void sendImage() async {
+    // using the image picker to select an image
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 50,
+      maxWidth: 800,
+      maxHeight: 800,
+    );
+
+    // conver the the image to a path
+    // and send it to the chat service
+    // check if the image is null
+    if (image != null) {
+      // send the image to the chat service
+      await _chatService.sendImage(
+        widget.receiverID,
+        File(image.path),
+      );
+    } else {
+      // show an error message if the image is null
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("No image selected"),
+        ),
+      );
+    }
+  }
   // sending the message
   void sendMessage() async {
     // case where there is input inside of the text field:
     if (_messageController.text.isNotEmpty) {
       // send the message
       await _chatService.sendMessage(
-          widget.receiverID, _messageController.text);
+          widget.receiverID, message: _messageController.text);
 
       // after sending the message, clear the controller ->
       _messageController.clear();
@@ -170,6 +202,7 @@ class _ChatPageState extends State<ChatPage> {
             children: [
               ChatBubble(
                 message: data["message"],
+                imageURL: data["imageURL"],
                 isCurrentUser: isCurrentUser,
               )
             ]));
@@ -178,7 +211,7 @@ class _ChatPageState extends State<ChatPage> {
   // finally, build the user input
   Widget _buildUserInput() {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 50.0),
+      padding: const EdgeInsets.only(bottom: 30.0),
       child: Row(
         children: [
           // textfield has to take up majority of the space
@@ -191,13 +224,28 @@ class _ChatPageState extends State<ChatPage> {
               focusNode: myFocusNode,
             ),
           ),
+          // implement the image button
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.amber,
+              shape: BoxShape.circle,
+            ),
+            margin: const EdgeInsets.only(right: 10),
+            child: IconButton(
+              onPressed: sendImage,
+              icon: const Icon(
+                Icons.image,
+                color: Colors.white,
+              ),
+            ),
+          ),
           // implement the send button
           Container(
             decoration: BoxDecoration(
               color: Colors.amber,
               shape: BoxShape.circle,
             ),
-            margin: const EdgeInsets.only(right: 25),
+            margin: const EdgeInsets.only(right: 15),
             child: IconButton(
               onPressed: sendMessage,
               icon: const Icon(

@@ -73,9 +73,9 @@ class _ActualHomeState extends State<ActualHome> {
       UserProfilePage(uid: uid),
     ];
 
-    return ConstrainedScaffold(
+    return Scaffold(
       // backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: _selectedIndex == 4 || _selectedIndex == 3
+      appBar: _selectedIndex != 0 // Show AppBar on Home Page ONLY
           ? null
           : // Hide AppBar on Profile Page
           AppBar(
@@ -107,74 +107,83 @@ class _ActualHomeState extends State<ActualHome> {
 
       // New logic: only show BlocBuilder when Home tab is selected
       body: _selectedIndex == 0
-          ? BlocBuilder<PostCubit, PostState>(
-              builder: (context, state) {
-                // the possible states are:
-                // 1. loading
-                if (state is PostLoading) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-                // 2. loaded
-                else if (state is PostLoaded) {
-                  final allPosts = state.posts;
-
-                  // but if its empty we can show a message
-                  if (allPosts.isEmpty) {
+          ? SafeArea(
+            child: BlocBuilder<PostCubit, PostState>(
+                builder: (context, state) {
+                  // the possible states are:
+                  // 1. loading
+                  if (state is PostLoading) {
                     return const Center(
-                      child: Text("No posts available"),
+                      child: CircularProgressIndicator(),
                     );
                   }
-
-                  // otherwise we can show the posts
-                  // return a list view of the posts
-                  return ListView.builder(
-                    itemCount: allPosts.length,
-                    itemBuilder: (context, index) {
-                      final post = allPosts[index];
-                      return PostTile(
-                        post: post,
-                        onDeletePressed: () => deletePost(post.id),
+                  // 2. loaded
+                  else if (state is PostLoaded) {
+                    final allPosts = state.posts;
+            
+                    // but if its empty we can show a message
+                    if (allPosts.isEmpty) {
+                      return const Center(
+                        child: Text("No posts available"),
                       );
-                    },
-                  );
-                }
-                // 3. uploading
-                else if (state is PostUpload) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-                // 4. error
-                else if (state is PostError) {
-                  return const Center(
-                    child: Text("Error loading posts"),
-                  );
-                } else {
-                  return const SizedBox();
-                }
-              },
-            )
+                    }
+            
+                    // otherwise we can show the posts
+                    // return a list view of the posts
+                    return ListView.builder(
+                      itemCount: allPosts.length,
+                      itemBuilder: (context, index) {
+                        final post = allPosts[index];
+                        return PostTile(
+                          post: post,
+                          onDeletePressed: () => deletePost(post.id),
+                        );
+                      },
+                    );
+                  }
+                  // 3. uploading
+                  else if (state is PostUpload) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                  // 4. error
+                  else if (state is PostError) {
+                    return const Center(
+                      child: Text("Error loading posts"),
+                    );
+                  } else {
+                    return const SizedBox();
+                  }
+                },
+              ),
+          )
           // When another tab is selected, render the appropriate page
           : pages[_selectedIndex],
 
-      bottomNavigationBar: GNav(
-        backgroundColor: Theme.of(context).colorScheme.secondary,
-        gap: 8,
-        selectedIndex: _selectedIndex,
-        onTabChange: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-        tabs: const [
-          GButton(icon: Icons.home, text: 'Home'),
-          GButton(icon: Icons.article, text: 'News'),
-          GButton(icon: Icons.people, text: 'Friends'),
-          GButton(icon: Icons.event, text: 'Calendar'),
-          GButton(icon: Icons.account_circle, text: 'Profile'),
-        ],
+      // single child scroll view to avoid overflow
+      // and to make the bottom navigation bar scrollable
+      bottomNavigationBar: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: SafeArea(
+          child: GNav(
+            backgroundColor: Theme.of(context).colorScheme.secondary,
+            gap: 8,
+            selectedIndex: _selectedIndex,
+            onTabChange: (index) {
+              setState(() {
+                _selectedIndex = index;
+              });
+            },
+            tabs: const [
+              GButton(icon: Icons.home, text: 'Home'),
+              GButton(icon: Icons.article, text: 'News'),
+              GButton(icon: Icons.people, text: 'Friends'),
+              GButton(icon: Icons.event, text: 'Calendar'),
+              GButton(icon: Icons.account_circle, text: 'Profile'),
+            ],
+          ),
+        ),
       ),
     );
   }

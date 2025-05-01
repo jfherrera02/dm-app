@@ -7,6 +7,8 @@ class Message {
   final String receiverID;
   final String message;
   final Timestamp timestamp;
+  // implement sending and receiving images
+  final String? imageURL;
 
   Message({
     required this.senderID,
@@ -14,6 +16,9 @@ class Message {
     required this.receiverID,
     required this.message,
     required this.timestamp,
+    // optional image URL for sending images
+    this.imageURL,
+
   });
 
   // now convert it to a map
@@ -24,6 +29,7 @@ class Message {
       'receiverID': receiverID,
       'message': message,
       'timestamp': timestamp,
+      'imageURL': imageURL,
     };
   }
 }

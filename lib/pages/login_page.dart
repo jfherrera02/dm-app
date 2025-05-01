@@ -55,85 +55,87 @@ class LoginPageState extends State<LoginPage> {
   // Begin building the UI
   @override
   Widget build(BuildContext context) {
-    return ConstrainedScaffold(
+    return Scaffold(
       // Body
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 28.0),
-          child: Column(
-            children: [
-              // Lock icon
-              Image(image: AssetImage('assets/images/tether_text_black.png'),
-              width: 200,
-              height: 200,
-              fit: BoxFit.cover,
+      body: SingleChildScrollView(
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 28.0),
+            child: Column(
+              children: [
+                // Lock icon
+                Image(image: AssetImage('assets/images/tether_text_black.png'),
+                width: 200,
+                height: 200,
+                fit: BoxFit.cover,
+                    ),
+                const SizedBox(height: 25),
+        
+                // Personalized message (Greeting)
+                Text(
+                  "Welcome to Tether",
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.primary,
+                    fontSize: 18,
                   ),
-              const SizedBox(height: 25),
-
-              // Personalized message (Greeting)
-              Text(
-                "Welcome to Tether",
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.primary,
-                  fontSize: 18,
                 ),
-              ),
-
-              const SizedBox(height: 30),
-
-              // Use custom text field (import):
-              // Email text field:
-              MyTextField(
-                hintText: "Email",
-                obscureText: false,
-                controller: emailController,
-              ),
-
-              const SizedBox(height: 12),
-
-              // Password text field:
-              MyTextField(
-                hintText: "Password",
-                obscureText: true,
-                controller: passwordController,
-              ),
-
-              const SizedBox(height: 25),
-
-              // Make the login button
-              MyButton(
-                text: "Login",
-                onTap: login,
-              ),
-
-              const SizedBox(height: 45),
-
-              // Method to go to register page ->
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "New to Tether?",
-                    style:
-                        TextStyle(color: Theme.of(context).colorScheme.primary),
-                  ),
-                  const SizedBox(width: 5),
-                  GestureDetector(
-                    // Make onTap into a widget so it can
-                    // also be used in the register page / etc..
-                    // onTap will serve as a toggle page
-                    onTap: widget.onTap,
-                    child: Text(
-                      "Tap to Register",
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.inversePrimary,
-                        fontWeight: FontWeight.bold,
+        
+                const SizedBox(height: 30),
+        
+                // Use custom text field (import):
+                // Email text field:
+                MyTextField(
+                  hintText: "Email",
+                  obscureText: false,
+                  controller: emailController,
+                ),
+        
+                const SizedBox(height: 12),
+        
+                // Password text field:
+                MyTextField(
+                  hintText: "Password",
+                  obscureText: true,
+                  controller: passwordController,
+                ),
+        
+                const SizedBox(height: 25),
+        
+                // Make the login button
+                MyButton(
+                  text: "Login",
+                  onTap: login,
+                ),
+        
+                const SizedBox(height: 45),
+        
+                // Method to go to register page ->
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "New to Tether?",
+                      style:
+                          TextStyle(color: Theme.of(context).colorScheme.primary),
+                    ),
+                    const SizedBox(width: 5),
+                    GestureDetector(
+                      // Make onTap into a widget so it can
+                      // also be used in the register page / etc..
+                      // onTap will serve as a toggle page
+                      onTap: widget.onTap,
+                      child: Text(
+                        "Tap to Register",
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.inversePrimary,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

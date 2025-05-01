@@ -155,7 +155,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
   }
 
   Widget buildUploadPage() {
-    return ConstrainedScaffold(
+    return Scaffold(
       appBar: AppBar(
         title: const Text("Create a Post"),
         actions: [
