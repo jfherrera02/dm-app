@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:dmessages/responsive/constrained_scaffold.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:dmessages/components/my_textfield.dart';
 import 'package:dmessages/pages/profile/presentation/cubit/profile_cubit.dart';

@@ -1,8 +1,6 @@
-// Create a list of all users (except self) 
 import 'package:dmessages/calendar/data/calendar_repository.dart';
 import 'package:dmessages/calendar/domain/calendar_cubit.dart';
 import 'package:dmessages/calendar/presentation/friends_calendar.dart';
-import 'package:dmessages/components/user_tile.dart';
 import 'package:dmessages/services/auth/auth_service.dart';
 import 'package:dmessages/services/chat/chat_services.dart';
 import 'package:flutter/material.dart';
@@ -43,32 +41,47 @@ class _FriendsListState extends State<FriendsList> {
         actions: [
 
         ],
+        elevation: 0,
+        backgroundColor: Theme.of(context).colorScheme.surface,
       ),
-      body: Column(
-        children: [
-          // Display Search Results or User List
-          Expanded(
-            child: _searchResults.isEmpty
-                ? _buildUserList() // Display the list of users if no search results
-                : ListView.builder(
-                    itemCount: _searchResults.length,
-                    itemBuilder: (context, index) {
-                      final user = _searchResults[index];
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Column(
+          children: [
+            // Display Search Results or User List
+            Expanded(
+              child: _searchResults.isEmpty
+                  ? _buildUserList() // Display the list of users if no search results
+                  : ListView.separated(
+                      itemCount: _searchResults.length,
+                      separatorBuilder: (_, __) => SizedBox(height: 8),
+                      itemBuilder: (context, index) {
+                        final user = _searchResults[index];
 
-                      return ListTile(
-                        leading: CircleAvatar(
-                          backgroundImage: user['profileImageUrl'] != null
-                              ? NetworkImage(user['profileImageUrl'])
-                              : AssetImage('assets/images/default_avatar.png')
-                                  as ImageProvider,
-                        ),
-                        title: Text(user['username']),
-                        subtitle: Text(user['email']),
-                      );
-                    },
-                  ),
-          ),
-        ],
+                        return ListTile(
+                          leading: CircleAvatar(
+                            backgroundImage: user['profileImageUrl'] != null
+                                ? NetworkImage(user['profileImageUrl'])
+                                : null,
+                            child: user['profileImageUrl'] == null
+                                ? Icon(Icons.person)
+                                : null,
+                          ),
+                          title: Text(user['username']),
+                          subtitle: Text(user['email']),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          tileColor: Theme.of(context).colorScheme.surfaceVariant,
+                          contentPadding:
+                              EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                          trailing: Icon(Icons.chevron_right),
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -91,10 +104,13 @@ class _FriendsListState extends State<FriendsList> {
           return const Center(child: Text("No friends available."));
         }
 
-        return ListView(
-          children: snapshot.data!
-              .map<Widget>((userData) => _buildUserListItem(userData, context))
-              .toList(),
+        return ListView.separated(
+          itemCount: snapshot.data!.length,
+          separatorBuilder: (_, __) => SizedBox(height: 8),
+          itemBuilder: (context, index) {
+            final userData = snapshot.data![index];
+            return _buildUserListItem(userData, context);
+          },
         );
       },
     );
@@ -117,10 +133,24 @@ class _FriendsListState extends State<FriendsList> {
       return Container(); // Skip current user
     }
 
-    return UserTile(
-      text: userData["username"],
+    return ListTile(
+      leading: CircleAvatar(
+        backgroundImage: userData['profileImageUrl'] != null
+            ? NetworkImage(userData['profileImageUrl'])
+            : null,
+        child:
+            userData['profileImageUrl'] == null ? Icon(Icons.person) : null,
+      ),
+      title: Text(userData["username"]),
+      subtitle: Text(userData["email"]),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      tileColor: Theme.of(context).colorScheme.surfaceVariant,
+      contentPadding:
+          EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      trailing: Icon(Icons.chevron_right),
       onTap: () {
-        // Navigate to the chat page when tapping a user
         Navigator.push(
           context,
           MaterialPageRoute(

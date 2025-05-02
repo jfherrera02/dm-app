@@ -60,51 +60,62 @@ class _FriendPageState extends State<FriendPage> {
             },
           ),
         ],
+        elevation: 0,
+        backgroundColor: Theme.of(context).colorScheme.surface,
       ),
-      body: Column(
-        children: [
-          // Search Bar
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: "Search by username...",
-                prefixIcon: Icon(Icons.search),
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-              ),
-              onChanged: _searchUsers,
-            ),
-          ),
-
-          // Display Search Results or User List
-          Expanded(
-            child: _searchResults.isEmpty
-                ? _buildUserList() // Display the list of users if no search results
-                : ListView.builder(
-                    itemCount: _searchResults.length,
-                    itemBuilder: (context, index) {
-                      final user = _searchResults[index];
-
-                      return ListTile(
-                        leading: CircleAvatar(
-                          backgroundImage: user['profileImageUrl'] != null
-                              ? NetworkImage(user['profileImageUrl'])
-                              : AssetImage('assets/images/default_avatar.png')
-                                  as ImageProvider,
-                        ),
-                        title: Text(user['username']),
-                        subtitle: Text(user['email']),
-                        trailing: ElevatedButton(
-                          onPressed: () => _sendFriendRequest(user['uid']),
-                          child: Text("Add Friend"),
-                        ),
-                      );
-                    },
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Column(
+          children: [
+            // Search Bar
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+              child: TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  hintText: "Search by username...",
+                  prefixIcon: Icon(Icons.search),
+                  filled: true,
+                  fillColor: Theme.of(context).colorScheme.surfaceVariant,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
                   ),
-          ),
-        ],
+                ),
+                onChanged: _searchUsers,
+              ),
+            ),
+
+            // Display Search Results or User List
+            Expanded(
+              child: _searchResults.isEmpty
+                  ? _buildUserList() // Display the list of users if no search results
+                  : ListView.builder(
+                      itemCount: _searchResults.length,
+                      itemBuilder: (context, index) {
+                        final user = _searchResults[index];
+
+                        return ListTile(
+                          leading: CircleAvatar(
+                            backgroundImage: user['profileImageUrl'] != null
+                                ? NetworkImage(user['profileImageUrl'])
+                                : null,
+                            child: user['profileImageUrl'] == null
+                                ? Icon(Icons.person)
+                                : null,
+                          ),
+                          title: Text(user['username']),
+                          subtitle: Text(user['email']),
+                          trailing: ElevatedButton(
+                            onPressed: () => _sendFriendRequest(user['uid']),
+                            child: Text("Add Friend"),
+                          ),
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -127,10 +138,13 @@ class _FriendPageState extends State<FriendPage> {
           return const Center(child: Text("No friends available."));
         }
 
-        return ListView(
-          children: snapshot.data!
-              .map<Widget>((userData) => _buildUserListItem(userData, context))
-              .toList(),
+        return ListView.separated(
+          itemCount: snapshot.data!.length,
+          separatorBuilder: (_, __) => SizedBox(height: 8),
+          itemBuilder: (context, index) {
+            final userData = snapshot.data![index];
+            return _buildUserListItem(userData, context);
+          },
         );
       },
     );
@@ -145,8 +159,23 @@ class _FriendPageState extends State<FriendPage> {
       return Container(); // Skip current user
     }
 
-    return UserTile(
-      text: userData["username"],
+    return ListTile(
+      leading: CircleAvatar(
+        backgroundImage: userData['profileImageUrl'] != null
+            ? NetworkImage(userData['profileImageUrl'])
+            : null,
+        child:
+            userData['profileImageUrl'] == null ? Icon(Icons.person) : null,
+      ),
+      title: Text(userData["username"]),
+      subtitle: Text(userData["email"]),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      tileColor: Theme.of(context).colorScheme.surfaceVariant,
+      contentPadding:
+          EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      trailing: Icon(Icons.chevron_right),
       onTap: () {
         // Navigate to the chat page when tapping a user
         Navigator.push(

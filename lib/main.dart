@@ -11,6 +11,7 @@ import 'package:dmessages/firebase_options.dart';
 import 'package:dmessages/services/auth/data/firebase_auth_repo.dart';
 import 'package:dmessages/services/auth/presentation/auth_states.dart';
 import 'package:dmessages/services/auth/presentation/cubits/auth_cubits.dart';
+import 'package:dmessages/themes/theme_cubit.dart';
 import 'package:dmessages/themes/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -79,48 +80,56 @@ class MyApp extends StatelessWidget {
             storageRepo: storageRepository,
           ),
         ),
-        // calendar cubit provider
-      ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: Provider.of<ThemeProvider>(context).themeData,
-        home: BlocConsumer<AuthCubit, AuthStates>(
-          builder: (context, authStates) {
-            // unath -> go to login/register
-            if (authStates is UnAuthenticated) {
-              return AuthGate();
-            }
-
-            // authenticated -> go to the home page
-            if (authStates is Authenticated) {
-              return BlocProvider<CalendarCubit>(
-                create: (context) => CalendarCubit(
-                  calendarId: authStates.user.uid,
-                  repository: calendarRepository,
-                ),
-                child: const ActualHome(),
-              );
-            }
-
-            // loading...
-            else {
-              return const Scaffold(
-                // loading circle
-                body: Center(
-                  child: CircularProgressIndicator(),
-                ),
-              );
-            }
-          },
-
-          // check for any possible errors
-          listener: (context, state) {
-            if (state is AuthError) {
-              ScaffoldMessenger.of(context)
-                  .showSnackBar(SnackBar(content: Text(state.message)));
-            }
-          },
+        // theme cubit
+        BlocProvider<ThemeCubit>(
+          create: (context) => ThemeCubit(),
         ),
+      ],
+      child: BlocBuilder<ThemeCubit, ThemeData>(
+        builder: (context, currentTheme) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: currentTheme,
+            // checks current auth state
+            home: BlocConsumer<AuthCubit, AuthStates>(
+              builder: (context, authStates) {
+                // unath -> go to login/register
+                if (authStates is UnAuthenticated) {
+                  return AuthGate();
+                }
+
+                // authenticated -> go to the home page
+                if (authStates is Authenticated) {
+                  return BlocProvider<CalendarCubit>(
+                    create: (context) => CalendarCubit(
+                      calendarId: authStates.user.uid,
+                      repository: calendarRepository,
+                    ),
+                    child: const ActualHome(),
+                  );
+                }
+
+                // loading...
+                else {
+                  return const Scaffold(
+                    // loading circle
+                    body: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                }
+              },
+
+              // check for any possible errors
+              listener: (context, state) {
+                if (state is AuthError) {
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text(state.message)));
+                }
+              },
+            ),
+          );
+        },
       ),
     );
   }

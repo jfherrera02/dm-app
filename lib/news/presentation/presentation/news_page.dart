@@ -62,7 +62,7 @@ class NewsPageState extends State<NewsPage>
           controller: _tabController,
           tabs: const [
             Tab(text: 'Home'),
-            Tab(text: 'All Countries'),
+            Tab(text: 'World News'),
             Tab(text: 'Sources'),
           ],
         ),

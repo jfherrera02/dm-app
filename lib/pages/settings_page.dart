@@ -1,4 +1,4 @@
-import 'package:dmessages/themes/theme_provider.dart';
+import 'package:dmessages/themes/theme_cubit.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -8,6 +8,12 @@ class SettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Get the theme cubit
+    final themeCubit = context.watch<ThemeCubit>();
+
+    // check if the theme is dark or light
+    bool isDarkMode = themeCubit.isDarkMode;
+
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
@@ -35,10 +41,9 @@ class SettingsPage extends StatelessWidget {
             // switch toggle ->
             CupertinoSwitch(
               value:
-                  Provider.of<ThemeProvider>(context, listen: false).isDarkMode,
+                  isDarkMode,
               onChanged: (value) =>
-                  Provider.of<ThemeProvider>(context, listen: false)
-                      .toggleTheme(),
+                  themeCubit.toggleTheme(),
             ),
           ],
         ),

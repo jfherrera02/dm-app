@@ -1,6 +1,6 @@
 import 'package:dmessages/components/my_button.dart';
-import 'package:dmessages/responsive/constrained_scaffold.dart';
 import 'package:dmessages/services/auth/presentation/cubits/auth_cubits.dart';
+import 'package:dmessages/themes/theme_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:dmessages/components/my_textfield.dart';
 import 'package:provider/provider.dart';
@@ -55,6 +55,13 @@ class LoginPageState extends State<LoginPage> {
   // Begin building the UI
   @override
   Widget build(BuildContext context) {
+
+    final themeCubit = context.watch<ThemeCubit>();
+
+    // check if the theme is dark or light
+    bool isDarkMode = themeCubit.isDarkMode;
+
+    
     return Scaffold(
       // Body
       body: SingleChildScrollView(
@@ -64,11 +71,19 @@ class LoginPageState extends State<LoginPage> {
             child: Column(
               children: [
                 // Lock icon
-                Image(image: AssetImage('assets/images/tether_text_black.png'),
+                if (isDarkMode)
+                  Image(image: AssetImage('assets/images/tether-text-white.png'),
                 width: 200,
                 height: 200,
                 fit: BoxFit.cover,
-                    ),
+                )
+                else
+                  // App logo
+                  Image(image: AssetImage('assets/images/tether_text_black.png'),
+                width: 200,
+                height: 200,
+                fit: BoxFit.cover,
+                ),
                 const SizedBox(height: 25),
         
                 // Personalized message (Greeting)

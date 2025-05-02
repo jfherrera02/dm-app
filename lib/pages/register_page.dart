@@ -1,6 +1,6 @@
 import 'package:country_picker/country_picker.dart';
-import 'package:dmessages/responsive/constrained_scaffold.dart';
 import 'package:dmessages/services/auth/presentation/cubits/auth_cubits.dart';
+import 'package:dmessages/themes/theme_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:dmessages/components/my_button.dart';
 import 'package:dmessages/components/my_textfield.dart';
@@ -78,6 +78,12 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Get the theme cubit
+    final themeCubit = context.watch<ThemeCubit>();
+
+    // check if the theme is dark or light
+    bool isDarkMode = themeCubit.isDarkMode;
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -101,12 +107,19 @@ class _RegisterPageState extends State<RegisterPage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 // App logo
+                if (isDarkMode)
+                  Image.asset(
+                    'assets/images/tether-text-white.png',
+                    width: 200,
+                    height: 200,
+                  )
+                else
+                  // App logo
                 Image.asset(
                   'assets/images/tether_text_black.png',
                   width: 200,
                   height: 200,
                 ),
-        
                 const SizedBox(height: 16),
         
                 // Login Greeting Message

@@ -7,7 +7,6 @@ import 'package:dmessages/pages/profile/presentation/cubit/profile_page.dart';
 import 'package:dmessages/post/presentation/cubits/post_cubit.dart';
 import 'package:dmessages/post/presentation/cubits/post_states.dart';
 import 'package:dmessages/post/presentation/pages/upload_post_page.dart';
-import 'package:dmessages/responsive/constrained_scaffold.dart';
 import 'package:dmessages/services/auth/presentation/cubits/auth_cubits.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -163,25 +162,27 @@ class _ActualHomeState extends State<ActualHome> {
 
       // single child scroll view to avoid overflow
       // and to make the bottom navigation bar scrollable
-      bottomNavigationBar: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: SafeArea(
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
           child: GNav(
-            backgroundColor: Theme.of(context).colorScheme.secondary,
-            gap: 8,
-            selectedIndex: _selectedIndex,
-            onTabChange: (index) {
-              setState(() {
-                _selectedIndex = index;
-              });
-            },
-            tabs: const [
-              GButton(icon: Icons.home, text: 'Home'),
-              GButton(icon: Icons.article, text: 'News'),
-              GButton(icon: Icons.people, text: 'Friends'),
-              GButton(icon: Icons.event, text: 'Calendar'),
-              GButton(icon: Icons.account_circle, text: 'Profile'),
-            ],
+        // make active color low opacity
+        activeColor: Theme.of(context).colorScheme.inversePrimary.withAlpha(100),
+        backgroundColor: Theme.of(context).colorScheme.secondary,
+        gap: 4,
+        selectedIndex: _selectedIndex,
+        onTabChange: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
+        tabs: const [
+          GButton(icon: Icons.home),
+          GButton(icon: Icons.article,),
+          GButton(icon: Icons.people,),
+          GButton(icon: Icons.event,),
+          GButton(icon: Icons.account_circle,),
+        ],
           ),
         ),
       ),
